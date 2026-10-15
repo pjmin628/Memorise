@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>포켓 플래시카드 & 초압축 시험지 생성기</title>
+  <title>포켓 플래시카드 & 클라우드 싱크</title>
   <meta name="theme-color" content="#4f46e5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <style>
@@ -43,7 +43,6 @@
       padding-bottom: 95px;
     }
 
-    /* 상단 헤더 */
     header {
       background: var(--card-bg);
       border-bottom: 1px solid var(--border);
@@ -70,7 +69,7 @@
     }
 
     .app-title {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 800;
       color: var(--primary);
       display: flex;
@@ -78,9 +77,29 @@
       gap: 6px;
     }
 
+    .sync-status-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: var(--text-sub);
+      cursor: pointer;
+    }
+
+    .sync-status-pill.online {
+      background: #ecfdf5;
+      color: #047857;
+    }
+
+    .sync-status-pill.syncing {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
     .backup-actions {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
     }
 
@@ -88,14 +107,14 @@
       border: 1px solid var(--border);
       background: var(--card-bg);
       color: var(--text-main);
-      padding: 7px 11px;
+      padding: 7px 10px;
       border-radius: 10px;
-      font-size: 0.82rem;
+      font-size: 0.81rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       transition: all 0.15s ease;
     }
 
@@ -113,14 +132,20 @@
       background: var(--primary-hover);
     }
 
+    .btn-cloud {
+      background: #0284c7;
+      color: #fff;
+      border-color: #0284c7;
+    }
+
+    .btn-cloud:hover {
+      background: #0369a1;
+    }
+
     .btn-doc {
       background: #0f172a;
       color: #fff;
       border-color: #0f172a;
-    }
-
-    .btn-doc:hover {
-      background: #1e293b;
     }
 
     .btn-success {
@@ -135,7 +160,6 @@
       border-color: #fecdd3;
     }
 
-    /* 검색 및 필터 영역 */
     .search-filter-row {
       display: flex;
       gap: 6px;
@@ -208,7 +232,6 @@
       color: var(--wrong-active);
     }
 
-    /* 과목 탭 바 */
     .subject-bar {
       display: flex;
       gap: 6px;
@@ -240,7 +263,6 @@
       border-color: var(--primary);
     }
 
-    /* 메인 컨테이너 */
     main {
       max-width: 768px;
       margin: 16px auto 0;
@@ -424,7 +446,6 @@
       justify-content: center;
       font-size: 0.95rem;
       cursor: pointer;
-      transition: all 0.15s;
     }
 
     .icon-btn.fav-on {
@@ -495,7 +516,6 @@
       border: 1px solid var(--border);
       background: #fff;
       cursor: zoom-in;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     .card-table-wrap {
@@ -861,10 +881,6 @@
     .stats-box-title {
       font-size: 1.02rem;
       font-weight: 800;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .subject-Proportion-bar {
@@ -1040,7 +1056,6 @@
     .pill-correct { background: #ecfdf5; color: #047857; }
     .pill-wrong { background: #fef2f2; color: #b91c1c; }
 
-    /* 전체 목록 모드 */
     .list-container {
       display: grid;
       grid-template-columns: 1fr;
@@ -1293,7 +1308,7 @@
       top: 0;
     }
 
-    /* ================= 🖨️ 초압축 시험지(문제지·정답지) 미리보기 및 인쇄 스타일 ================= */
+    /* 초압축 시험지 미리보기 및 인쇄 스타일 */
     .doc-options-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -1316,7 +1331,6 @@
       font-family: "Malgun Gothic", "맑은 고딕", "Pretendard", sans-serif;
     }
 
-    /* 초압축 노트 전용 타이포그래피 (첨부 PDF 스타일 완벽 재현) */
     .ultra-sheet-title {
       font-size: 15pt;
       font-weight: 900;
@@ -1384,7 +1398,6 @@
       padding: 0 4px;
       margin: 0 1px;
       color: #000;
-      letter-spacing: 0.5px;
     }
 
     .ultra-ans-text {
@@ -1433,7 +1446,6 @@
       padding-top: 18px;
     }
 
-    /* 실제 브라우저 인쇄용 루트 */
     #printRoot {
       display: none;
     }
@@ -1494,12 +1506,16 @@
   <header>
     <div class="header-inner">
       <div class="top-bar">
-        <div class="app-title">🗂️ 포켓 플래시카드</div>
+        <div class="app-title">
+          <span>🗂️ 포켓 플래시카드</span>
+          <span id="cloudStatusBadge" class="sync-status-pill" onclick="openCloudModal()" title="클라우드 동기화 상태">☁️ 로컬 전용</span>
+        </div>
         <div class="backup-actions">
-          <button class="btn btn-doc" onclick="openDocExportModal()" title="초압축 양식의 빈칸 문제지 및 정답지 PDF/Word 출력">🖨️ 문제지·정답지 출력</button>
-          <button class="btn btn-primary" onclick="openCsvModal()" title="엑셀/CSV 대량 업로드 및 내보내기">📊 엑셀/CSV</button>
-          <button class="btn" onclick="exportBackup()" title="전체 백업(JSON)">💾 백업</button>
-          <button class="btn" onclick="document.getElementById('importFile').click()" title="백업 복원">📂 복원</button>
+          <button class="btn btn-cloud" onclick="openCloudModal()" title="휴대폰·태블릿 온라인 클라우드 동기화 설정">☁️ 클라우드 동기화</button>
+          <button class="btn btn-doc" onclick="openDocExportModal()" title="초압축 양식의 빈칸 문제지 및 정답지 출력">🖨️ 시험지 출력</button>
+          <button class="btn btn-primary" onclick="openCsvModal()" title="엑셀/CSV 대량 관리">📊 엑셀/CSV</button>
+          <button class="btn" onclick="exportBackup()" title="파일 백업(JSON)">💾</button>
+          <button class="btn" onclick="document.getElementById('importFile').click()" title="파일 복원">📂</button>
           <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
         </div>
       </div>
@@ -1558,10 +1574,10 @@
                 <span id="studyMonthBadgeFront" class="study-count-badge">이달 0회</span>
               </div>
               <div class="card-actions-top" onclick="event.stopPropagation()">
-                <button id="studyWrongBtn" class="icon-btn" onclick="toggleCurrentWrong()" title="오답노트 등록/해제">📕</button>
-                <button id="studyFavBtn" class="icon-btn" onclick="toggleCurrentFav()" title="즐겨찾기 토글">☆</button>
-                <button class="icon-btn" onclick="openEditCurrentCard()" title="카드 편집">✏️</button>
-                <button class="icon-btn" onclick="deleteCurrentCard()" title="카드 삭제">🗑️</button>
+                <button id="studyWrongBtn" class="icon-btn" onclick="toggleCurrentWrong()">📕</button>
+                <button id="studyFavBtn" class="icon-btn" onclick="toggleCurrentFav()">☆</button>
+                <button class="icon-btn" onclick="openEditCurrentCard()">✏️</button>
+                <button class="icon-btn" onclick="deleteCurrentCard()">🗑️</button>
               </div>
             </div>
             <div class="card-body">
@@ -1581,9 +1597,9 @@
                 <span id="studyMonthBadgeBack" class="study-count-badge">이달 0회</span>
               </div>
               <div class="card-actions-top" onclick="event.stopPropagation()">
-                <button id="studyWrongBtnBack" class="icon-btn" onclick="toggleCurrentWrong()" title="오답노트 등록/해제">📕</button>
-                <button id="studyFavBtnBack" class="icon-btn" onclick="toggleCurrentFav()" title="즐겨찾기 토글">☆</button>
-                <button class="icon-btn" onclick="openEditCurrentCard()" title="카드 편집">✏️</button>
+                <button id="studyWrongBtnBack" class="icon-btn" onclick="toggleCurrentWrong()">📕</button>
+                <button id="studyFavBtnBack" class="icon-btn" onclick="toggleCurrentFav()">☆</button>
+                <button class="icon-btn" onclick="openEditCurrentCard()">✏️</button>
               </div>
             </div>
             <div class="card-body align-top">
@@ -1591,7 +1607,7 @@
               <div id="studyMediaBack" class="card-media-box" style="display:none;" onclick="event.stopPropagation()"></div>
               <div id="studyContent" class="card-content-text">내용</div>
             </div>
-            <div class="card-footer">👆 다시 터치하면 앞면으로 돌아갑니다 (사진 터치 시 확대)</div>
+            <div class="card-footer">👆 다시 터치하면 앞면으로 돌아갑니다</div>
           </div>
         </div>
       </div>
@@ -1630,9 +1646,9 @@
             <span id="testWrongBadge" class="wrong-count-badge" style="display:none;">오답 1회</span>
           </div>
           <div class="card-actions-top">
-            <button id="testWrongBtn" class="icon-btn" onclick="toggleCurrentWrong()" title="오답노트 수동 등록/해제">📕</button>
-            <button id="testFavBtn" class="icon-btn" onclick="toggleCurrentFav()" title="즐겨찾기 토글">☆</button>
-            <button class="icon-btn" onclick="openEditCurrentCard()" title="카드 편집">✏️</button>
+            <button id="testWrongBtn" class="icon-btn" onclick="toggleCurrentWrong()">📕</button>
+            <button id="testFavBtn" class="icon-btn" onclick="toggleCurrentFav()">☆</button>
+            <button class="icon-btn" onclick="openEditCurrentCard()">✏️</button>
           </div>
         </div>
 
@@ -1660,8 +1676,8 @@
             <div id="feedbackAnswer" class="feedback-answer"></div>
             <div id="feedbackSubNotice" style="font-size:0.82rem; opacity:0.9;"></div>
             <div style="display:flex; gap:8px; margin-top:4px; flex-wrap:wrap;">
-              <button id="overrideCorrectBtn" class="btn btn-success" onclick="overrideAsCorrect()" style="display:none;">✔ 내 답안도 정답으로 인정(오답 취소)</button>
-              <button id="manualGraduateBtn" class="btn btn-success" onclick="graduateCurrentCard()" style="display:none;">🎓 오답노트에서 졸업(해제)</button>
+              <button id="overrideCorrectBtn" class="btn btn-success" onclick="overrideAsCorrect()" style="display:none;">✔ 내 답안도 정답으로 인정</button>
+              <button id="manualGraduateBtn" class="btn btn-success" onclick="graduateCurrentCard()" style="display:none;">🎓 오답노트에서 졸업</button>
               <button class="btn" onclick="nextCard()">다음 문제로 ▶</button>
             </div>
           </div>
@@ -1687,7 +1703,7 @@
           <div id="clozeTitle" class="cloze-title"></div>
           <div id="clozeContent" class="cloze-content-area"></div>
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <span style="font-size:0.8rem; color:var(--text-sub);">💡 본문이나 표 안의 파란색 빈칸을 터치해 확인하세요.</span>
+            <span style="font-size:0.8rem; color:var(--text-sub);">💡 파란색 빈칸을 터치해 확인하세요.</span>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
               <button class="btn btn-success" onclick="recordSelfScore(true)">⭕ 암기 완료 (정답 기록)</button>
               <button class="btn btn-danger-outline" onclick="recordSelfScore(false)">❌ 재복습 필요 (오답 기록)</button>
@@ -1778,7 +1794,6 @@
     <!-- 4. 전체 목록 모드 -->
     <section id="listSection" class="list-container" style="display: none;"></section>
 
-    <!-- 빈 상태 -->
     <div id="emptyState" class="empty-state" style="display: none;">
       <p id="emptyTitle" style="font-size: 1.05rem; font-weight: 700; margin-bottom: 6px;">표시할 플래시카드가 없습니다.</p>
       <p id="emptyDesc" style="font-size: 0.88rem;">검색어나 필터를 초기화하거나 우측 하단의 <b>+ 새 카드 추가</b> 버튼을 눌러보세요.</p>
@@ -1787,6 +1802,80 @@
 
   <button class="fab" onclick="openAddModal()">＋ 새 카드 추가</button>
 
+  <!-- ☁️ 온라인 클라우드 자동 동기화 설정 모달 -->
+  <div id="cloudModal" class="modal-backdrop" onclick="closeCloudModalOnBackdrop(event)">
+    <div class="modal">
+      <div class="modal-title">
+        <span>☁️ 휴대폰 · 태블릿 클라우드 동기화</span>
+        <button class="btn" style="padding:4px 9px;" onclick="closeCloudModal()">✕</button>
+      </div>
+
+      <p style="font-size:0.81rem; color:var(--text-sub); margin-bottom:12px;">
+        JSON 파일을 수동으로 옮기지 않아도 휴대폰과 태블릿이 <b>동일한 클라우드 저장소</b>를 바라보며 카드와 학습 기록을 자동으로 주고받습니다.
+      </p>
+
+      <div class="form-group">
+        <label>클라우드 저장소 방식 선택</label>
+        <select id="cloudProviderSelect" class="form-control" onchange="toggleCloudProviderFields()">
+          <option value="firebase" selected>🔥 Google Firebase Realtime DB (가장 간편·추천)</option>
+          <option value="gist">🐙 GitHub Gist API (깃허브 토큰 활용·대용량 사진 유리)</option>
+        </select>
+      </div>
+
+      <!-- 방식 A: Firebase 설정 필드 -->
+      <div id="firebaseConfigBox" class="csv-section-box">
+        <div class="csv-section-title">🔥 Firebase Realtime Database 연결 정보</div>
+        <div class="form-group">
+          <label style="font-size:0.8rem;">1. 데이터베이스 주소 (Database URL)</label>
+          <input type="url" id="fbDbUrlInput" class="form-control" placeholder="예: https://my-cards-default-rtdb.firebaseio.com" />
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="font-size:0.8rem;">2. 나만의 동기화 공간 이름 (영문/숫자 암호키 역할)</label>
+          <input type="text" id="fbSyncKeyInput" class="form-control" placeholder="예: jongmin_social_2026" />
+          <span style="font-size:0.74rem; color:var(--text-sub);">휴대폰과 태블릿에 똑같은 URL과 공간 이름을 입력하면 즉시 연동됩니다.</span>
+        </div>
+      </div>
+
+      <!-- 방식 B: GitHub Gist 설정 필드 -->
+      <div id="gistConfigBox" class="csv-section-box" style="display:none;">
+        <div class="csv-section-title">🐙 GitHub Gist API 연결 정보</div>
+        <div class="form-group">
+          <label style="font-size:0.8rem;">1. GitHub Personal Access Token (gist 권한 체크)</label>
+          <input type="password" id="gistTokenInput" class="form-control" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="font-size:0.8rem;">2. Gist ID (비워두고 '클라우드에 올리기'를 누르면 새 비공개 Gist가 자동 생성됨)</label>
+          <input type="text" id="gistIdInput" class="form-control" placeholder="예: a1b2c3d4e5f6g7h8i9j0" />
+        </div>
+      </div>
+
+      <div class="form-group" style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+          <input type="checkbox" id="cloudAutoSyncCheck" style="width:18px; height:18px;" checked />
+          <span>⚡ <b>자동 동기화 켜기</b> (앱 실행 시 자동 불러오기 + 카드 변경 시 자동 클라우드 저장)</span>
+        </label>
+      </div>
+
+      <div id="cloudLastSyncInfo" style="font-size:0.78rem; color:var(--primary); font-weight:700; margin-bottom:10px;">
+        최근 동기화 기록 없음
+      </div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid var(--border); padding-top:14px;">
+        <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="saveCloudConfigAndPull()">
+          📥 클라우드에서 지금 불러오기
+        </button>
+        <button class="btn btn-success" style="flex:1; justify-content:center;" onclick="saveCloudConfigAndPush()">
+          📤 현재 데이터를 클라우드에 올리기
+        </button>
+      </div>
+
+      <div class="modal-actions" style="margin-top:12px;">
+        <button class="btn btn-danger-outline" onclick="disconnectCloud()">연동 해제</button>
+        <button class="btn" onclick="saveCloudConfigOnly()">설정만 저장 후 닫기</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 🖨️ 초압축 문제지·정답지 문서 출력 모달 -->
   <div id="docExportModal" class="modal-backdrop" onclick="closeDocExportModalOnBackdrop(event)">
     <div class="modal modal-wide">
@@ -1794,10 +1883,6 @@
         <span>🖨️ 시험장용 초압축 문서 출력 (문제지 + 정답지)</span>
         <button class="btn" style="padding:4px 9px;" onclick="closeDocExportModal()">✕</button>
       </div>
-
-      <p style="font-size:0.82rem; color:var(--text-sub); margin-bottom:10px;">
-        선호하시는 <b>[과목 - 제목]★★ + Keyword! + 초압축 표·본문</b> 양식으로 <b>빈칸 퀴즈 문제지</b>와 <b>정답지</b>를 함께 생성합니다. 본문 내 <code>[단어]</code> 또는 <code>"단어"</code>로 표시한 핵심어가 모두 빈칸 처리됩니다.
-      </p>
 
       <div class="doc-options-grid">
         <div>
@@ -1839,15 +1924,14 @@
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
         <span id="docPreviewSummary" style="font-size:0.82rem; font-weight:800; color:var(--primary);">출력 대상: 0장</span>
-        <span style="font-size:0.76rem; color:var(--text-sub);">💡 PDF 저장 팁: [인쇄 / PDF 저장] 클릭 후 프린터 대상을 <b>'PDF로 저장'</b>으로 선택하세요.</span>
+        <span style="font-size:0.76rem; color:var(--text-sub);">💡 [인쇄 / PDF 저장] 클릭 후 프린터 대상을 <b>'PDF로 저장'</b>으로 선택하세요.</span>
       </div>
 
-      <!-- 실시간 문서 양식 미리보기 -->
       <div id="docPreviewFrame" class="doc-preview-frame"></div>
 
       <div class="modal-actions">
         <button class="btn" onclick="closeDocExportModal()">닫기</button>
-        <button class="btn btn-success" onclick="exportToWordDoc()">📝 Word (.doc) 파일 다운로드</button>
+        <button class="btn btn-success" onclick="exportToWordDoc()">📝 Word (.doc) 다운로드</button>
         <button class="btn btn-primary" onclick="triggerPdfPrint()">🖨️ 인쇄 / PDF로 바로 저장</button>
       </div>
     </div>
@@ -1871,7 +1955,7 @@
       </div>
 
       <div class="form-group">
-        <label>중요도 (초압축 출력 시 제목 옆 ★ 개수로 표시)</label>
+        <label>중요도</label>
         <select id="cardImportance" class="form-control">
           <option value="3">★★★ (상 - 핵심 암기)</option>
           <option value="2" selected>★★☆ (중 - 주요 개념)</option>
@@ -1896,7 +1980,7 @@
             </button>
           </div>
         </div>
-        <textarea id="cardContentInput" class="form-control" placeholder="암기할 내용을 입력하세요.&#10;• [핵심단어] 또는 &quot;핵심단어&quot;로 감싸면 셀프 테스트와 시험지 출력에서 자동으로 빈칸 처리됩니다."></textarea>
+        <textarea id="cardContentInput" class="form-control" placeholder="암기할 내용을 입력하세요."></textarea>
       </div>
 
       <div class="form-group">
@@ -2007,25 +2091,22 @@
     </div>
   </div>
 
-  <!-- 이미지 확대 라이트박스 -->
   <div id="lightbox" class="lightbox-backdrop" onclick="closeLightbox()">
     <img id="lightboxImg" src="" alt="확대 이미지" />
   </div>
 
-  <!-- 실제 인쇄 시 출력되는 전용 컨테이너 -->
   <div id="printRoot"></div>
-
   <div id="toast" class="toast">저장되었습니다.</div>
 
   <script>
     const STORAGE_KEY = 'pocket_flashcards_v1';
     const LOGS_STORAGE_KEY = 'pocket_flashcard_logs_v1';
+    const CLOUD_CONFIG_KEY = 'pocket_flashcard_cloud_cfg_v1';
 
     const SUBJECT_PALETTE = [
       '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316'
     ];
 
-    // 첨부된 '사회문화 초압축.pdf' 양식을 그대로 재현한 기본 카드 세트
     const DEFAULT_CARDS = [
       {
         id: 'sample-soc-1',
@@ -2065,37 +2146,21 @@
         imageData: null,
         imagePos: 'back',
         createdAt: Date.now() - 3000
-      },
-      {
-        id: 'sample-soc-4',
-        subject: '사회·문화',
-        title: '일탈이론 - 머튼의 아노미 적응 양식',
-        content: '문화적 목표와 제도적 수단 간의 괴리로 아노미 발생:\n| 적응 유형 | 문화적 목표 | 제도적 수단 |\n| --- | --- | --- |\n| 동조 | 수용 | 수용 |\n| "혁신" | 수용 | "거부" |\n| "의례주의" | "거부" | 수용 |\n| ★"도피주의" | 거부 | 거부 |\n| ★"반역" | "대체" | "대체" |',
-        importance: 2,
-        favorite: false,
-        isWrong: false,
-        wrongCount: 0,
-        imageData: null,
-        imagePos: 'back',
-        createdAt: Date.now() - 2000
-      },
-      {
-        id: 'sample-edu-1',
-        subject: '교육학',
-        title: '백워드 교육과정 설계 모형',
-        content: '위긴스와 맥타이(Wiggins & McTighe) 제시:\n1단계: [바라는 결과] 확인하기 (성취기준, 영속적 이해)\n2단계: [수용 가능한 증거] 결정하기 (수행과제, 평가계획)\n3단계: [학습 경험과 수업] 계획하기 (WHERETO 원리)',
-        importance: 3,
-        favorite: false,
-        isWrong: false,
-        wrongCount: 0,
-        imageData: null,
-        imagePos: 'back',
-        createdAt: Date.now() - 1000
       }
     ];
 
     let cards = [];
     let studyLogs = [];
+    let cloudConfig = {
+      provider: 'firebase', // 'firebase' | 'gist'
+      fbUrl: '',
+      fbKey: 'my_flashcards',
+      gistToken: '',
+      gistId: '',
+      autoSync: true,
+      lastSyncText: ''
+    };
+
     let selectedSubject = '전체';
     let favOnly = false;
     let wrongOnly = false;
@@ -2117,60 +2182,23 @@
 
     let pendingCsvCards = [];
     let currentEditingImageData = null;
+    let autoPushTimer = null;
 
     function getTodayDateStr() {
       const d = new Date();
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
     function getTodayMonthStr() {
       return getTodayDateStr().slice(0, 7);
     }
 
-    function createInitialSampleLogs(cardList) {
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const curMonth = `${y}-${m}`;
-      const todayDay = now.getDate();
-
-      const sampleEvents = [
-        { cardIdx: 0, dayOffset: 0, type: 'view' },
-        { cardIdx: 0, dayOffset: 0, type: 'correct' },
-        { cardIdx: 1, dayOffset: 0, type: 'correct' },
-        { cardIdx: 2, dayOffset: 0, type: 'wrong' },
-        { cardIdx: 3, dayOffset: -1, type: 'view' }
-      ];
-
-      const logs = [];
-      sampleEvents.forEach((ev, idx) => {
-        const targetCard = cardList[ev.cardIdx];
-        if (!targetCard) return;
-        const dNum = Math.max(1, todayDay + ev.dayOffset);
-        const dateStr = `${curMonth}-${String(dNum).padStart(2, '0')}`;
-        logs.push({
-          id: 'sample-log-' + idx,
-          timestamp: Date.now() + idx * 1000,
-          dateStr,
-          monthStr: curMonth,
-          cardId: targetCard.id,
-          subject: targetCard.subject,
-          title: targetCard.title,
-          type: ev.type
-        });
-      });
-      return logs;
-    }
-
-    function initApp() {
+    async function initApp() {
+      // 로컬 카드 불러오기
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
-          const parsed = JSON.parse(saved);
-          cards = parsed.map(c => ({
+          cards = JSON.parse(saved).map(c => ({
             ...c,
             isWrong: Boolean(c.isWrong),
             wrongCount: Number(c.wrongCount) || 0,
@@ -2182,40 +2210,283 @@
         }
       } else {
         cards = [...DEFAULT_CARDS];
-        saveToStorage();
+        saveToStorage(false);
       }
 
+      // 로컬 학습 로그 불러오기
       const savedLogs = localStorage.getItem(LOGS_STORAGE_KEY);
       if (savedLogs) {
-        try {
-          studyLogs = JSON.parse(savedLogs);
-        } catch (e) {
-          studyLogs = [];
-        }
-      } else {
-        studyLogs = createInitialSampleLogs(cards);
-        saveLogsToStorage();
+        try { studyLogs = JSON.parse(savedLogs); } catch (e) { studyLogs = []; }
+      }
+
+      // 클라우드 설정 불러오기
+      const savedCloud = localStorage.getItem(CLOUD_CONFIG_KEY);
+      if (savedCloud) {
+        try { cloudConfig = { ...cloudConfig, ...JSON.parse(savedCloud) }; } catch (e) {}
       }
 
       document.getElementById('monthInputPicker').value = currentStatsMonth;
+      updateCloudBadgeUI();
       renderSubjects();
       updateWrongFilterButtonCount();
       applyFilters();
-    }
 
-    function saveToStorage() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-        updateWrongFilterButtonCount();
-      } catch (err) {
-        alert('브라우저 저장 공간이 부족합니다. 백업(JSON)을 활용해주세요.');
+      // 자동 동기화가 켜져 있고 클라우드 설정이 완료된 경우 앱 시작 시 최신 데이터 자동 Pull
+      if (cloudConfig.autoSync && isCloudConfigured()) {
+        await pullFromCloud(true);
       }
     }
 
-    function saveLogsToStorage() {
-      localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(studyLogs));
+    function saveToStorage(triggerCloud = true) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+        updateWrongFilterButtonCount();
+        if (triggerCloud) scheduleAutoCloudPush();
+      } catch (err) {
+        alert('브라우저 저장 공간이 부족합니다.');
+      }
     }
 
+    function saveLogsToStorage(triggerCloud = true) {
+      localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(studyLogs));
+      if (triggerCloud) scheduleAutoCloudPush();
+    }
+
+    /* ================= ☁️ 클라우드 자동 동기화 엔진 (Firebase & GitHub Gist) ================= */
+    function isCloudConfigured() {
+      if (cloudConfig.provider === 'firebase') {
+        return Boolean(cloudConfig.fbUrl && cloudConfig.fbKey);
+      }
+      if (cloudConfig.provider === 'gist') {
+        return Boolean(cloudConfig.gistToken && cloudConfig.gistId);
+      }
+      return false;
+    }
+
+    function updateCloudBadgeUI(state = 'idle') {
+      const badge = document.getElementById('cloudStatusBadge');
+      if (!isCloudConfigured()) {
+        badge.className = 'sync-status-pill';
+        badge.textContent = '☁️ 로컬 전용';
+        return;
+      }
+      if (state === 'syncing') {
+        badge.className = 'sync-status-pill syncing';
+        badge.textContent = '🔄 클라우드 동기화 중...';
+      } else {
+        badge.className = 'sync-status-pill online';
+        badge.textContent = cloudConfig.provider === 'firebase' ? '☁️ Firebase 연결됨' : '☁️ Gist 연결됨';
+      }
+      const infoEl = document.getElementById('cloudLastSyncInfo');
+      if (infoEl) {
+        infoEl.textContent = cloudConfig.lastSyncText || '클라우드 연결 대기 중';
+      }
+    }
+
+    // 데이터 변경 시 1.5초 디바운스로 클라우드에 자동 저장
+    function scheduleAutoCloudPush() {
+      if (!cloudConfig.autoSync || !isCloudConfigured()) return;
+      clearTimeout(autoPushTimer);
+      autoPushTimer = setTimeout(() => {
+        pushToCloud(true);
+      }, 1500);
+    }
+
+    function getFirebaseEndpointUrl() {
+      let base = cloudConfig.fbUrl.trim().replace(/\/+$/, '');
+      if (!base.startsWith('http')) base = 'https://' + base;
+      const safeKey = encodeURIComponent(cloudConfig.fbKey.trim().replace(/[.#$\[\]]/g, '_'));
+      return `${base}/pocket_flashcards/${safeKey}.json`;
+    }
+
+    async function pushToCloud(silent = false) {
+      if (cloudConfig.provider === 'firebase' && (!cloudConfig.fbUrl || !cloudConfig.fbKey)) {
+        if (!silent) alert('Firebase DB 주소와 공간 이름을 입력해주세요.');
+        return;
+      }
+      if (cloudConfig.provider === 'gist' && !cloudConfig.gistToken) {
+        if (!silent) alert('GitHub Personal Access Token을 입력해주세요.');
+        return;
+      }
+
+      updateCloudBadgeUI('syncing');
+      const payload = {
+        updatedAt: Date.now(),
+        updatedTimeStr: new Date().toLocaleString('ko-KR'),
+        cards,
+        studyLogs
+      };
+
+      try {
+        if (cloudConfig.provider === 'firebase') {
+          const res = await fetch(getFirebaseEndpointUrl(), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('Firebase 저장 실패 (' + res.status + ')');
+        } else {
+          // GitHub Gist API
+          const bodyObj = {
+            description: 'Pocket Flashcards Cloud Sync Data',
+            public: false,
+            files: {
+              'flashcards_sync.json': { content: JSON.stringify(payload) }
+            }
+          };
+          const gistUrl = cloudConfig.gistId
+            ? `https://api.github.com/gists/${cloudConfig.gistId.trim()}`
+            : `https://api.github.com/gists`;
+          const res = await fetch(gistUrl, {
+            method: cloudConfig.gistId ? 'PATCH' : 'POST',
+            headers: {
+              'Authorization': `token ${cloudConfig.gistToken.trim()}`,
+              'Accept': 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyObj)
+          });
+          if (!res.ok) throw new Error('GitHub Gist 저장 실패 (' + res.status + ')');
+          const data = await res.json();
+          if (!cloudConfig.gistId && data.id) {
+            cloudConfig.gistId = data.id;
+            document.getElementById('gistIdInput').value = data.id;
+          }
+        }
+
+        cloudConfig.lastSyncText = `최근 클라우드 저장: ${new Date().toLocaleTimeString('ko-KR')}`;
+        localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cloudConfig));
+        updateCloudBadgeUI('idle');
+        if (!silent) showToast('☁️ 클라우드에 최신 카드와 기록을 저장했습니다!');
+      } catch (err) {
+        updateCloudBadgeUI('idle');
+        if (!silent) alert('클라우드 업로드 오류: ' + err.message);
+      }
+    }
+
+    async function pullFromCloud(silent = false) {
+      if (!isCloudConfigured()) {
+        if (!silent) alert('클라우드 연결 정보를 먼저 입력해주세요.');
+        return;
+      }
+
+      updateCloudBadgeUI('syncing');
+      try {
+        let remoteData = null;
+
+        if (cloudConfig.provider === 'firebase') {
+          const res = await fetch(getFirebaseEndpointUrl());
+          if (!res.ok) throw new Error('Firebase 불러오기 실패 (' + res.status + ')');
+          remoteData = await res.json();
+        } else {
+          const res = await fetch(`https://api.github.com/gists/${cloudConfig.gistId.trim()}`, {
+            headers: {
+              'Authorization': `token ${cloudConfig.gistToken.trim()}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+          if (!res.ok) throw new Error('Gist 불러오기 실패 (' + res.status + ')');
+          const gistJson = await res.json();
+          const fileObj = gistJson.files && gistJson.files['flashcards_sync.json'];
+          if (fileObj && fileObj.content) {
+            remoteData = JSON.parse(fileObj.content);
+          }
+        }
+
+        if (!remoteData || !Array.isArray(remoteData.cards)) {
+          updateCloudBadgeUI('idle');
+          if (!silent) showToast('클라우드에 아직 저장된 데이터가 없습니다. 먼저 [클라우드에 올리기]를 눌러주세요.');
+          return;
+        }
+
+        cards = remoteData.cards.map(c => ({
+          ...c,
+          isWrong: Boolean(c.isWrong),
+          wrongCount: Number(c.wrongCount) || 0,
+          imageData: c.imageData || null,
+          imagePos: c.imagePos || 'back'
+        }));
+        studyLogs = Array.isArray(remoteData.studyLogs) ? remoteData.studyLogs : [];
+
+        saveToStorage(false);
+        saveLogsToStorage(false);
+
+        cloudConfig.lastSyncText = `최근 클라우드 불러오기: ${new Date().toLocaleTimeString('ko-KR')} (${cards.length}장)`;
+        localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cloudConfig));
+        updateCloudBadgeUI('idle');
+
+        renderSubjects();
+        applyFilters();
+        showToast(`☁️ 클라우드에서 최신 카드 ${cards.length}장을 동기화했습니다!`);
+      } catch (err) {
+        updateCloudBadgeUI('idle');
+        if (!silent) alert('클라우드 불러오기 오류: ' + err.message);
+      }
+    }
+
+    function openCloudModal() {
+      document.getElementById('cloudProviderSelect').value = cloudConfig.provider || 'firebase';
+      document.getElementById('fbDbUrlInput').value = cloudConfig.fbUrl || '';
+      document.getElementById('fbSyncKeyInput').value = cloudConfig.fbKey || 'my_flashcards';
+      document.getElementById('gistTokenInput').value = cloudConfig.gistToken || '';
+      document.getElementById('gistIdInput').value = cloudConfig.gistId || '';
+      document.getElementById('cloudAutoSyncCheck').checked = Boolean(cloudConfig.autoSync);
+      toggleCloudProviderFields();
+      updateCloudBadgeUI();
+      document.getElementById('cloudModal').classList.add('open');
+    }
+
+    function closeCloudModal() {
+      document.getElementById('cloudModal').classList.remove('open');
+    }
+
+    function closeCloudModalOnBackdrop(e) {
+      if (e.target.id === 'cloudModal') closeCloudModal();
+    }
+
+    function toggleCloudProviderFields() {
+      const prov = document.getElementById('cloudProviderSelect').value;
+      document.getElementById('firebaseConfigBox').style.display = prov === 'firebase' ? 'block' : 'none';
+      document.getElementById('gistConfigBox').style.display = prov === 'gist' ? 'block' : 'none';
+    }
+
+    function readCloudModalInputs() {
+      cloudConfig.provider = document.getElementById('cloudProviderSelect').value;
+      cloudConfig.fbUrl = document.getElementById('fbDbUrlInput').value.trim();
+      cloudConfig.fbKey = document.getElementById('fbSyncKeyInput').value.trim() || 'my_flashcards';
+      cloudConfig.gistToken = document.getElementById('gistTokenInput').value.trim();
+      cloudConfig.gistId = document.getElementById('gistIdInput').value.trim();
+      cloudConfig.autoSync = document.getElementById('cloudAutoSyncCheck').checked;
+      localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cloudConfig));
+      updateCloudBadgeUI();
+    }
+
+    async function saveCloudConfigAndPull() {
+      readCloudModalInputs();
+      await pullFromCloud(false);
+    }
+
+    async function saveCloudConfigAndPush() {
+      readCloudModalInputs();
+      await pushToCloud(false);
+    }
+
+    function saveCloudConfigOnly() {
+      readCloudModalInputs();
+      closeCloudModal();
+      showToast('클라우드 설정이 저장되었습니다.');
+    }
+
+    function disconnectCloud() {
+      if (!confirm('클라우드 동기화 연결을 해제하시겠습니까? (기기에 저장된 카드는 유지됩니다.)')) return;
+      cloudConfig = { provider: 'firebase', fbUrl: '', fbKey: 'my_flashcards', gistToken: '', gistId: '', autoSync: false, lastSyncText: '' };
+      localStorage.removeItem(CLOUD_CONFIG_KEY);
+      updateCloudBadgeUI();
+      closeCloudModal();
+      showToast('클라우드 연동이 해제되었습니다.');
+    }
+
+    /* ================= 공통 학습/필터/렌더링 로직 ================= */
     function recordStudyLog(card, type = 'view') {
       if (!card) return null;
       const dateStr = getTodayDateStr();
@@ -2255,9 +2526,7 @@
     function renderSubjects() {
       const bar = document.getElementById('subjectBar');
       const subjects = getSubjects();
-      if (!subjects.includes(selectedSubject)) {
-        selectedSubject = '전체';
-      }
+      if (!subjects.includes(selectedSubject)) selectedSubject = '전체';
       bar.innerHTML = subjects.map(sub => {
         const count = sub === '전체' ? cards.length : cards.filter(c => c.subject === sub).length;
         const activeClass = sub === selectedSubject ? 'active' : '';
@@ -2268,9 +2537,7 @@
     function selectSubject(sub) {
       selectedSubject = sub;
       currentIndex = 0;
-      if (viewMode === 'stats') {
-        statsSubjectFilter = sub === '전체' ? 'ALL' : sub;
-      }
+      if (viewMode === 'stats') statsSubjectFilter = sub === '전체' ? 'ALL' : sub;
       renderSubjects();
       applyFilters();
     }
@@ -2291,11 +2558,8 @@
 
     function clearAllWrongNotes() {
       const wrongCards = cards.filter(c => c.isWrong);
-      if (wrongCards.length === 0) {
-        showToast('현재 오답노트에 등록된 카드가 없습니다.');
-        return;
-      }
-      if (!confirm(`오답노트에 등록된 ${wrongCards.length}장의 카드를 모두 오답 해제하시겠습니까?`)) return;
+      if (wrongCards.length === 0) return;
+      if (!confirm(`오답노트 ${wrongCards.length}장을 모두 해제하시겠습니까?`)) return;
       cards.forEach(c => { c.isWrong = false; });
       saveToStorage();
       applyFilters();
@@ -2336,7 +2600,6 @@
       if (currentIndex >= filteredCards.length) {
         currentIndex = Math.max(0, filteredCards.length - 1);
       }
-
       renderMainView();
     }
 
@@ -2370,17 +2633,13 @@
       return '★';
     }
 
-    /* ================= [대괄호] 및 "큰따옴표" 통합 파서 & 표 렌더러 ================= */
-    // 카드 본문에서 [단어] 또는 "단어"로 지정된 핵심 키워드 목록 추출 (Keyword! 표기용)
     function extractKeywordsFromText(rawText) {
       const regex = /\[([^\]]+)\]|"([^"\r\n]{1,35})"/g;
       const kwSet = new Set();
       let m;
       while ((m = regex.exec(String(rawText ?? ''))) !== null) {
         const word = (m[1] || m[2] || '').trim();
-        if (word && !/^[:\-]+$/.test(word)) {
-          kwSet.add(word);
-        }
+        if (word && !/^[:\-]+$/.test(word)) kwSet.add(word);
       }
       return Array.from(kwSet);
     }
@@ -2398,7 +2657,6 @@
         return escapeHtml(text);
       }
 
-      // 빈칸 퀴즈 모드 (화면 Cloze, 인쇄용 문제지 doc-question, 인쇄용 정답지 doc-answer)
       if (mode === 'cloze' || mode === 'doc-question' || mode === 'doc-answer') {
         const targetRegex = /\[([^\]]+)\]|"([^"\r\n]{1,35})"/g;
         let parts = [];
@@ -2406,16 +2664,11 @@
         let match;
 
         while ((match = targetRegex.exec(text)) !== null) {
-          if (match.index > lastIdx) {
-            parts.push({ type: 'text', val: text.slice(lastIdx, match.index) });
-          }
-          const innerWord = match[1] || match[2];
-          parts.push({ type: 'manualBlank', val: innerWord });
+          if (match.index > lastIdx) parts.push({ type: 'text', val: text.slice(lastIdx, match.index) });
+          parts.push({ type: 'manualBlank', val: match[1] || match[2] });
           lastIdx = targetRegex.lastIndex;
         }
-        if (lastIdx < text.length) {
-          parts.push({ type: 'text', val: text.slice(lastIdx) });
-        }
+        if (lastIdx < text.length) parts.push({ type: 'text', val: text.slice(lastIdx) });
 
         return parts.map(part => {
           if (part.type === 'manualBlank') {
@@ -2423,22 +2676,15 @@
               return `<span class="cloze-blank" onclick="event.stopPropagation(); this.classList.toggle('revealed')">${escapeHtml(part.val)}</span>`;
             }
             if (mode === 'doc-question') {
-              // 글자 길이에 비례하는 밑줄 빈칸 생성
               const spaceLen = Math.max(4, Math.min(18, part.val.length * 2));
-              const blanks = '&nbsp;'.repeat(spaceLen);
-              return `<span class="ultra-blank-box">(${blanks})</span>`;
+              return `<span class="ultra-blank-box">(${'&nbsp;'.repeat(spaceLen)})</span>`;
             }
             if (mode === 'doc-answer') {
               return `<span class="ultra-ans-text">"${escapeHtml(part.val)}"</span>`;
             }
           }
-
-          if (autoRatio <= 0 || mode !== 'cloze') {
-            return escapeHtml(part.val);
-          }
-
-          const tokens = part.val.split(/(\s+)/);
-          return tokens.map(tok => {
+          if (autoRatio <= 0 || mode !== 'cloze') return escapeHtml(part.val);
+          return part.val.split(/(\s+)/).map(tok => {
             const cleanWord = tok.replace(/[.,?!:;()"'•\-]/g, '');
             if (cleanWord.length >= 2 && Math.random() < autoRatio) {
               return `<span class="cloze-blank" onclick="event.stopPropagation(); this.classList.toggle('revealed')">${escapeHtml(tok)}</span>`;
@@ -2448,7 +2694,6 @@
         }).join('');
       }
 
-      // 기본 'normal' 모드: [단어]는 굵게, "단어"는 그대로 깔끔하게 표시
       return escapeHtml(text.replace(/\[([^\]]+)\]/g, '$1'));
     }
 
@@ -2482,7 +2727,6 @@
       const rows = tableLines
         .map(line => line.slice(1, -1).split('|').map(cell => cell.trim()))
         .filter(cells => !cells.every(c => /^[:\-]+$/.test(c)));
-
       if (rows.length === 0) return '';
 
       const headerCells = rows[0];
@@ -2495,13 +2739,11 @@
         ? `<tbody>${bodyRows.map(r => `<tr>${r.map(c => `<td>${formatInlineSegment(c, options)}</td>`).join('')}</tr>`).join('')}</tbody>`
         : '';
 
-      if (isDocMode) {
-        return `<table class="${tableClass}">${theadHtml}${tbodyHtml}</table>`;
-      }
+      if (isDocMode) return `<table class="${tableClass}">${theadHtml}${tbodyHtml}</table>`;
       return `<div class="card-table-wrap" onclick="event.stopPropagation()"><table class="${tableClass}">${theadHtml}${tbodyHtml}</table></div>`;
     }
 
-    /* ================= 🖨️ 시험장용 초압축 문서(문제지 + 정답지) 생성 엔진 ================= */
+    /* ================= 초압축 시험지 출력 로직 ================= */
     function getTargetCardsForDoc() {
       const scope = document.getElementById('docTargetScope').value;
       if (scope === 'all') return [...cards];
@@ -2522,13 +2764,11 @@
         const stars = getImpStarsOnly(card.importance);
         const keywords = extractKeywordsFromText(card.content);
 
-        // 헤더 제목 구성: [과목 - 제목]★★
         let headerTitleText = `[${escapeHtml(card.subject)} - ${escapeHtml(card.title)}]`;
         if (!isAnswerSheet && hintMode === 'blankTitle') {
           headerTitleText = `[${escapeHtml(card.subject)} - ( _______________ )]`;
         }
 
-        // Keyword! 라인 구성 (첨부 파일의 'Keyword! ...' 스타일 재현)
         let keywordHtml = '';
         if (keywords.length > 0) {
           if (isAnswerSheet) {
@@ -2539,13 +2779,8 @@
           }
         }
 
-        const bodyHtml = renderRichContent(card.content, {
-          mode: isAnswerSheet ? 'doc-answer' : 'doc-question'
-        });
-
-        const imgHtml = card.imageData
-          ? `<img class="ultra-img" src="${card.imageData}" alt="첨부 도표" />`
-          : '';
+        const bodyHtml = renderRichContent(card.content, { mode: isAnswerSheet ? 'doc-answer' : 'doc-question' });
+        const imgHtml = card.imageData ? `<img class="ultra-img" src="${card.imageData}" alt="첨부 도표" />` : '';
 
         return `
           <div class="ultra-item">
@@ -2565,36 +2800,20 @@
             <span>${sheetTitle}</span>
             <span class="ultra-sheet-sub">총 ${targetCards.length}개 주제 | 출력일: ${getTodayDateStr()}</span>
           </div>
-          <div class="${colClass}">
-            ${itemsHtml}
-          </div>
+          <div class="${colClass}">${itemsHtml}</div>
         </div>
       `;
     }
 
     function generateFullDocumentHtml() {
       const targetCards = getTargetCardsForDoc();
-      const sheetMode = document.getElementById('docSheetMode').value; // 'both' | 'question' | 'answer'
-
+      const sheetMode = document.getElementById('docSheetMode').value;
       if (targetCards.length === 0) {
-        return `<div style="padding:30px; text-align:center; color:#64748b;">선택한 조건에 해당하는 카드가 없습니다.</div>`;
+        return `<div style="padding:30px; text-align:center; color:#64748b;">출력할 카드가 없습니다.</div>`;
       }
-
-      if (sheetMode === 'question') {
-        return buildUltraSheetHtml(targetCards, false);
-      }
-      if (sheetMode === 'answer') {
-        return buildUltraSheetHtml(targetCards, true);
-      }
-
-      // 문제지 + 정답지 모두 출력 (사이에 페이지 나누기 삽입)
-      const qHtml = buildUltraSheetHtml(targetCards, false);
-      const aHtml = buildUltraSheetHtml(targetCards, true);
-      return `
-        ${qHtml}
-        <div class="ultra-page-break"></div>
-        ${aHtml}
-      `;
+      if (sheetMode === 'question') return buildUltraSheetHtml(targetCards, false);
+      if (sheetMode === 'answer') return buildUltraSheetHtml(targetCards, true);
+      return `${buildUltraSheetHtml(targetCards, false)}<div class="ultra-page-break"></div>${buildUltraSheetHtml(targetCards, true)}`;
     }
 
     function openDocExportModal() {
@@ -2613,75 +2832,49 @@
     function updateDocPreview() {
       const targetCards = getTargetCardsForDoc();
       document.getElementById('docPreviewSummary').textContent = `출력 대상 카드: 총 ${targetCards.length}장`;
-      const html = generateFullDocumentHtml();
-      document.getElementById('docPreviewFrame').innerHTML = html;
+      document.getElementById('docPreviewFrame').innerHTML = generateFullDocumentHtml();
     }
 
-    // PDF 인쇄 실행
     function triggerPdfPrint() {
-      const targetCards = getTargetCardsForDoc();
-      if (targetCards.length === 0) {
-        alert('출력할 카드가 없습니다.');
-        return;
-      }
-      const printRoot = document.getElementById('printRoot');
-      printRoot.innerHTML = generateFullDocumentHtml();
+      if (getTargetCardsForDoc().length === 0) return;
+      document.getElementById('printRoot').innerHTML = generateFullDocumentHtml();
       window.print();
     }
 
-    // MS Word (.doc) 파일로 다운로드
     function exportToWordDoc() {
-      const targetCards = getTargetCardsForDoc();
-      if (targetCards.length === 0) {
-        alert('내보낼 카드가 없습니다.');
-        return;
-      }
+      if (getTargetCardsForDoc().length === 0) return;
       const docBodyHtml = generateFullDocumentHtml()
-        // Word에서 페이지 나누기 태그 호환 처리
         .replace(/<div class="ultra-page-break"><\/div>/g, '<br clear="all" style="mso-special-character:line-break; page-break-before:always;" />');
 
       const wordHtml = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office"
-              xmlns:w="urn:schemas-microsoft-com:office:word"
-              xmlns="http://www.w3.org/TR/REC-html40">
-        <head>
-          <meta charset="utf-8" />
-          <title>초압축 암기 문제지 및 정답지</title>
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+        <head><meta charset="utf-8" /><title>초압축 시험지</title>
           <style>
-            @page { size: 21cm 29.7cm; margin: 1.2cm 1.2cm 1.2cm 1.2cm; }
-            body { font-family: "맑은 고딕", "Malgun Gothic", sans-serif; font-size: 9.5pt; line-height: 1.45; color: #000; }
-            .ultra-sheet-title { font-size: 14pt; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 10px; }
-            .ultra-sheet-sub { font-size: 8.5pt; color: #444; margin-left: 10px; }
+            body { font-family: "맑은 고딕", sans-serif; font-size: 9.5pt; line-height: 1.45; }
+            .ultra-sheet-title { font-size: 14pt; font-weight: bold; border-bottom: 2px solid #000; margin-bottom: 10px; }
             .ultra-item { margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px dotted #999; }
-            .ultra-item-header { font-weight: bold; font-size: 10pt; margin-bottom: 3px; }
+            .ultra-item-header { font-weight: bold; font-size: 10pt; }
             .ultra-stars { color: #d97706; font-weight: bold; }
-            .ultra-keyword-line { color: #1e3a8a; font-weight: bold; font-size: 8.5pt; margin-left: 6px; }
+            .ultra-keyword-line { color: #1e3a8a; font-weight: bold; font-size: 8.5pt; }
             .ultra-body { white-space: pre-wrap; }
             .ultra-blank-box { font-weight: bold; text-decoration: underline; }
             .ultra-ans-text { font-weight: bold; color: #be123c; text-decoration: underline; }
             table.ultra-table { width: 100%; border-collapse: collapse; margin: 5px 0; font-size: 8.5pt; }
             table.ultra-table th, table.ultra-table td { border: 1px solid #000; padding: 4px 6px; }
-            table.ultra-table th { background-color: #f1f5f9; font-weight: bold; text-align: center; }
           </style>
-        </head>
-        <body>
-          ${docBodyHtml}
-        </body>
-        </html>
+        </head><body>${docBodyHtml}</body></html>
       `;
-
       const blob = new Blob(['\uFEFF', wordHtml], { type: 'application/msword;charset=utf-8' });
       const url = URL.createObjectURL(blob);
-      const dateStr = getTodayDateStr().replace(/-/g, '');
       const a = document.createElement('a');
       a.href = url;
-      a.download = `초압축_빈칸문제지_정답지_${dateStr}.doc`;
+      a.download = `초압축_빈칸문제지_정답지_${getTodayDateStr().replace(/-/g, '')}.doc`;
       a.click();
       URL.revokeObjectURL(url);
       showToast('📝 Word(.doc) 파일이 다운로드되었습니다!');
     }
 
-    /* ================= 메인 화면 렌더링 ================= */
+    /* ================= 화면 렌더링 ================= */
     function renderMainView() {
       const studySec = document.getElementById('studySection');
       const testSec = document.getElementById('testSection');
@@ -2708,14 +2901,6 @@
         testSec.style.display = 'none';
         listSec.style.display = 'none';
         emptyEl.style.display = 'block';
-
-        if (wrongOnly) {
-          document.getElementById('emptyTitle').textContent = '🎉 오답노트에 남은 카드가 없습니다!';
-          document.getElementById('emptyDesc').innerHTML = '모든 오답 카드를 정복했습니다. 상단의 <b>📕 오답노트</b> 버튼을 다시 눌러 전체 카드로 돌아가세요.';
-        } else {
-          document.getElementById('emptyTitle').textContent = '표시할 플래시카드가 없습니다.';
-          document.getElementById('emptyDesc').innerHTML = '검색어나 필터를 초기화하거나 우측 하단의 <b>+ 새 카드 추가</b> 버튼을 눌러보세요.';
-        }
         statusEl.textContent = '0장 검색됨';
         return;
       }
@@ -2746,15 +2931,11 @@
     function updateWrongBadges(card, badgeEl, btnEl) {
       if (card.isWrong || (card.wrongCount && card.wrongCount > 0)) {
         badgeEl.style.display = 'inline-block';
-        badgeEl.textContent = card.isWrong
-          ? `📕 오답 (${card.wrongCount || 1}회)`
-          : `오답이력 ${card.wrongCount}회`;
+        badgeEl.textContent = card.isWrong ? `📕 오답 (${card.wrongCount || 1}회)` : `오답이력 ${card.wrongCount}회`;
       } else {
         badgeEl.style.display = 'none';
       }
-      if (btnEl) {
-        btnEl.classList.toggle('wrong-on', Boolean(card.isWrong));
-      }
+      if (btnEl) btnEl.classList.toggle('wrong-on', Boolean(card.isWrong));
     }
 
     function renderStudyCard() {
@@ -2796,27 +2977,23 @@
 
       if (card.imageData && (pos === 'front' || pos === 'both')) {
         mediaFront.style.display = 'flex';
-        mediaFront.innerHTML = `<img class="card-media-img" src="${card.imageData}" alt="카드 이미지" onclick="openLightbox(this.src)" />`;
+        mediaFront.innerHTML = `<img class="card-media-img" src="${card.imageData}" onclick="openLightbox(this.src)" />`;
       } else {
         mediaFront.style.display = 'none';
-        mediaFront.innerHTML = '';
       }
 
       if (card.imageData && (pos === 'back' || pos === 'both')) {
         mediaBack.style.display = 'flex';
-        mediaBack.innerHTML = `<img class="card-media-img" src="${card.imageData}" alt="카드 이미지" onclick="openLightbox(this.src)" />`;
+        mediaBack.innerHTML = `<img class="card-media-img" src="${card.imageData}" onclick="openLightbox(this.src)" />`;
       } else {
         mediaBack.style.display = 'none';
-        mediaBack.innerHTML = '';
       }
     }
 
     function flipCard() {
       const scene = document.getElementById('flashcardScene');
       scene.classList.toggle('is-flipped');
-      const isNowBack = scene.classList.contains('is-flipped');
-
-      if (isNowBack && !flippedLoggedForCurrentCard) {
+      if (scene.classList.contains('is-flipped') && !flippedLoggedForCurrentCard) {
         const card = filteredCards[currentIndex];
         if (card) {
           recordStudyLog(card, 'view');
@@ -2831,29 +3008,22 @@
     function manualCheckStudy() {
       const card = filteredCards[currentIndex];
       if (!card) return;
-      if (!flippedLoggedForCurrentCard) {
-        recordStudyLog(card, 'view');
-      }
+      if (!flippedLoggedForCurrentCard) recordStudyLog(card, 'view');
       showToast(`✅ '${card.title}' 학습 이력이 기록되었습니다.`);
       nextCard();
     }
 
-    /* ================= 📷 사진 첨부 및 📋 표 삽입 ================= */
+    /* ================= 사진 압축 및 표 삽입 ================= */
     function compressImageDataUrl(file, maxWidth = 800, quality = 0.78) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = function(e) {
           const img = new Image();
           img.onload = function() {
-            let w = img.width;
-            let h = img.height;
-            if (w > maxWidth) {
-              h = Math.round((h * maxWidth) / w);
-              w = maxWidth;
-            }
+            let w = img.width, h = img.height;
+            if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
             const canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
+            canvas.width = w; canvas.height = h;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, w, h);
@@ -2879,22 +3049,18 @@
       try {
         currentEditingImageData = await compressImageDataUrl(file);
         updateModalImagePreview();
-        showToast('📷 사진이 압축되어 첨부되었습니다.');
+        showToast('📷 사진이 첨부되었습니다.');
       } catch (err) {
-        alert('이미지를 처리하는 중 오류가 발생했습니다.');
+        alert('이미지 처리 중 오류가 발생했습니다.');
       }
     }
 
     function updateModalImagePreview() {
       const wrap = document.getElementById('cardImagePreviewWrap');
       const imgEl = document.getElementById('cardImagePreview');
-      const sizeInfo = document.getElementById('cardImageSizeInfo');
-
       if (currentEditingImageData) {
         wrap.style.display = 'flex';
         imgEl.src = currentEditingImageData;
-        const kb = Math.round((currentEditingImageData.length * 3) / 4 / 1024);
-        sizeInfo.textContent = `경량화 용량: 약 ${kb} KB`;
       } else {
         wrap.style.display = 'none';
         imgEl.src = '';
@@ -2917,8 +3083,7 @@
     }
 
     window.addEventListener('paste', async (e) => {
-      const isCardModalOpen = document.getElementById('cardModal').classList.contains('open');
-      if (!isCardModalOpen) return;
+      if (!document.getElementById('cardModal').classList.contains('open')) return;
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       for (const item of items) {
         if (item.type.indexOf('image') === 0) {
@@ -2931,36 +3096,21 @@
     });
 
     function insertMarkdownTable() {
-      const colsInput = prompt('표의 열(가로 칸) 개수를 입력하세요 (예: 2 또는 3)', '3');
-      if (!colsInput) return;
-      const rowsInput = prompt('표의 데이터 행(세로 줄) 개수를 입력하세요 (예: 2 ~ 5)', '3');
-      if (!rowsInput) return;
-
-      const cols = Math.min(6, Math.max(2, parseInt(colsInput, 10) || 3));
-      const rows = Math.min(15, Math.max(1, parseInt(rowsInput, 10) || 3));
-
+      const cols = Math.min(6, Math.max(2, parseInt(prompt('열(가로 칸) 개수:', '3'), 10) || 3));
+      const rows = Math.min(15, Math.max(1, parseInt(prompt('행(세로 줄) 개수:', '3'), 10) || 3));
       const headers = Array.from({ length: cols }, (_, idx) => idx === 0 ? '구분' : `항목 ${idx}`);
       const divider = Array.from({ length: cols }, () => '---');
-      let lines = [
-        `| ${headers.join(' | ')} |`,
-        `| ${divider.join(' | ')} |`
-      ];
-
+      let lines = [`| ${headers.join(' | ')} |`, `| ${divider.join(' | ')} |`];
       for (let r = 1; r <= rows; r++) {
         const cells = Array.from({ length: cols }, (_, cIdx) => cIdx === 0 ? `기준 ${r}` : `"핵심내용 ${r}-${cIdx}"`);
         lines.push(`| ${cells.join(' | ')} |`);
       }
-
-      const tableText = '\n' + lines.join('\n') + '\n';
       const textarea = document.getElementById('cardContentInput');
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      textarea.value = textarea.value.substring(0, start) + tableText + textarea.value.substring(end);
+      textarea.value += '\n' + lines.join('\n') + '\n';
       textarea.focus();
-      showToast('📊 표 양식이 삽입되었습니다.');
     }
 
-    /* ================= 셀프 테스트 렌더링 및 로직 ================= */
+    /* ================= 셀프 테스트 로직 ================= */
     function renderTestCard() {
       const card = filteredCards[currentIndex];
       if (!card) return;
@@ -2969,7 +3119,6 @@
       const testImp = document.getElementById('testImp');
       testImp.className = `imp-badge imp-${card.importance}`;
       testImp.textContent = getImpLabel(card.importance);
-
       updateWrongBadges(card, document.getElementById('testWrongBadge'), document.getElementById('testWrongBtn'));
 
       const testFavBtn = document.getElementById('testFavBtn');
@@ -2979,44 +3128,31 @@
       const testMediaBox = document.getElementById('testMediaBox');
       if (card.imageData) {
         testMediaBox.style.display = 'flex';
-        testMediaBox.innerHTML = `<img class="card-media-img" src="${card.imageData}" alt="문제 이미지" onclick="openLightbox(this.src)" />`;
+        testMediaBox.innerHTML = `<img class="card-media-img" src="${card.imageData}" onclick="openLightbox(this.src)" />`;
       } else {
         testMediaBox.style.display = 'none';
-        testMediaBox.innerHTML = '';
       }
 
       if (testSubMode === 'typing') {
-        document.getElementById('typingPrompt').innerHTML = renderRichContent(card.content, {
-          mode: 'typing',
-          maskTitle: card.title.trim()
-        });
+        document.getElementById('typingPrompt').innerHTML = renderRichContent(card.content, { mode: 'typing', maskTitle: card.title.trim() });
         document.getElementById('answerInput').value = '';
         document.getElementById('chosungHintBox').style.display = 'none';
         document.getElementById('typingFeedback').className = 'feedback-box';
-        document.getElementById('overrideCorrectBtn').style.display = 'none';
-        document.getElementById('manualGraduateBtn').style.display = 'none';
       } else {
         document.getElementById('clozeTitle').textContent = card.title;
         const ratio = parseFloat(document.getElementById('clozeRatioSelect').value);
-        document.getElementById('clozeContent').innerHTML = renderRichContent(card.content, {
-          mode: 'cloze',
-          autoRatio: ratio
-        });
+        document.getElementById('clozeContent').innerHTML = renderRichContent(card.content, { mode: 'cloze', autoRatio: ratio });
       }
     }
 
     function getChosung(str) {
       const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
-      let result = '';
+      let res = '';
       for (let i = 0; i < str.length; i++) {
         const code = str.charCodeAt(i) - 44032;
-        if (code > -1 && code < 11172) {
-          result += CHO[Math.floor(code / 588)];
-        } else {
-          result += str.charAt(i);
-        }
+        res += (code > -1 && code < 11172) ? CHO[Math.floor(code / 588)] : str.charAt(i);
       }
-      return result;
+      return res;
     }
 
     function showChosungHint() {
@@ -3028,77 +3164,47 @@
     }
 
     function normalizeAnswer(str) {
-      return String(str)
-        .replace(/\([^)]*\)/g, '')
-        .replace(/[\s·,\-_/]/g, '')
-        .toLowerCase();
+      return String(str).replace(/\([^)]*\)/g, '').replace(/[\s·,\-_/]/g, '').toLowerCase();
     }
 
     function checkTypingAnswer() {
       const card = filteredCards[currentIndex];
       if (!card) return;
-
       const userInput = document.getElementById('answerInput').value.trim();
-      if (!userInput) {
-        showToast('정답을 입력해주세요.');
-        return;
-      }
+      if (!userInput) return;
 
-      const normUser = normalizeAnswer(userInput);
-      const normActual = normalizeAnswer(card.title);
-      const rawActualClean = card.title.replace(/[\s·,\-_/]/g, '').toLowerCase();
-      const isCorrect = (normUser.length > 0 && (normUser === normActual || normUser === rawActualClean));
+      const isCorrect = normalizeAnswer(userInput) === normalizeAnswer(card.title) ||
+                        normalizeAnswer(userInput) === card.title.replace(/[\s·,\-_/]/g, '').toLowerCase();
 
       const fbBox = document.getElementById('typingFeedback');
-      const fbHeader = document.getElementById('feedbackHeader');
-      const fbAnswer = document.getElementById('feedbackAnswer');
-      const fbSubNotice = document.getElementById('feedbackSubNotice');
-      const overrideBtn = document.getElementById('overrideCorrectBtn');
-      const graduateBtn = document.getElementById('manualGraduateBtn');
       const autoGraduate = document.getElementById('autoGraduateCheck').checked;
-
       lastAttemptCardId = card.id;
       prevWrongStateBeforeAttempt = Boolean(card.isWrong);
 
       if (isCorrect) {
         lastAttemptLogId = recordStudyLog(card, 'correct');
         fbBox.className = 'feedback-box correct';
-        fbHeader.textContent = '🎉 정답입니다!';
-        fbAnswer.textContent = `정답: ${card.title}`;
-        overrideBtn.style.display = 'none';
+        document.getElementById('feedbackHeader').textContent = '🎉 정답입니다!';
+        document.getElementById('feedbackAnswer').textContent = `정답: ${card.title}`;
+        document.getElementById('overrideCorrectBtn').style.display = 'none';
         scoreO++;
         lastAttemptWasWrong = false;
-
-        if (card.isWrong) {
-          if (autoGraduate) {
-            card.isWrong = false;
-            saveToStorage();
-            fbSubNotice.textContent = '🎓 정답을 맞혀 오답노트에서 자동으로 졸업(해제)되었습니다!';
-            graduateBtn.style.display = 'none';
-          } else {
-            fbSubNotice.textContent = '이 카드는 현재 오답노트에 등록되어 있습니다.';
-            graduateBtn.style.display = 'inline-flex';
-          }
-        } else {
-          fbSubNotice.textContent = '';
-          graduateBtn.style.display = 'none';
+        if (card.isWrong && autoGraduate) {
+          card.isWrong = false;
+          saveToStorage();
         }
       } else {
         lastAttemptLogId = recordStudyLog(card, 'wrong');
         fbBox.className = 'feedback-box wrong';
-        fbHeader.textContent = `❌ 아쉽습니다! (입력한 답: ${userInput})`;
-        fbAnswer.textContent = `실제 정답: ${card.title}`;
-        overrideBtn.style.display = 'inline-flex';
-        graduateBtn.style.display = 'none';
+        document.getElementById('feedbackHeader').textContent = `❌ 아쉽습니다! (입력: ${userInput})`;
+        document.getElementById('feedbackAnswer').textContent = `실제 정답: ${card.title}`;
+        document.getElementById('overrideCorrectBtn').style.display = 'inline-flex';
         scoreX++;
         lastAttemptWasWrong = true;
-
         card.isWrong = true;
         card.wrongCount = (card.wrongCount || 0) + 1;
         saveToStorage();
-        fbSubNotice.textContent = `📕 오답노트에 기록되었습니다. (누적 오답 ${card.wrongCount}회)`;
       }
-
       updateWrongBadges(card, document.getElementById('testWrongBadge'), document.getElementById('testWrongBtn'));
       updateScoreBoard();
     }
@@ -3106,31 +3212,17 @@
     function overrideAsCorrect() {
       const card = cards.find(c => c.id === lastAttemptCardId);
       if (!card || !lastAttemptWasWrong) return;
-
       if (scoreX > 0) scoreX--;
       scoreO++;
       lastAttemptWasWrong = false;
-
       const targetLog = studyLogs.find(l => l.id === lastAttemptLogId);
-      if (targetLog) {
-        targetLog.type = 'correct';
-        saveLogsToStorage();
-      }
-
+      if (targetLog) { targetLog.type = 'correct'; saveLogsToStorage(); }
       card.wrongCount = Math.max(0, (card.wrongCount || 1) - 1);
-      card.isWrong = prevWrongStateBeforeAttempt;
-      if (document.getElementById('autoGraduateCheck').checked) {
-        card.isWrong = false;
-      }
+      card.isWrong = document.getElementById('autoGraduateCheck').checked ? false : prevWrongStateBeforeAttempt;
       saveToStorage();
       updateScoreBoard();
-
-      const fbBox = document.getElementById('typingFeedback');
-      fbBox.className = 'feedback-box correct';
-      document.getElementById('feedbackHeader').textContent = '✔ 정답으로 인정되어 오답 기록이 취소되었습니다!';
-      document.getElementById('feedbackSubNotice').textContent = '';
+      document.getElementById('typingFeedback').className = 'feedback-box correct';
       document.getElementById('overrideCorrectBtn').style.display = 'none';
-      updateWrongBadges(card, document.getElementById('testWrongBadge'), document.getElementById('testWrongBtn'));
     }
 
     function graduateCurrentCard() {
@@ -3138,42 +3230,28 @@
       if (!card) return;
       card.isWrong = false;
       saveToStorage();
-      document.getElementById('manualGraduateBtn').style.display = 'none';
-      document.getElementById('feedbackSubNotice').textContent = '🎓 오답노트에서 해제되었습니다!';
       updateWrongBadges(card, document.getElementById('testWrongBadge'), document.getElementById('testWrongBtn'));
-      showToast('🎓 오답노트에서 졸업(해제)했습니다.');
     }
 
     function recordSelfScore(isSuccess) {
       const card = filteredCards[currentIndex];
       if (!card) return;
-      const autoGraduate = document.getElementById('autoGraduateCheck').checked;
-
       if (isSuccess) {
         scoreO++;
         recordStudyLog(card, 'correct');
-        if (card.isWrong && autoGraduate) {
-          card.isWrong = false;
-          saveToStorage();
-          showToast('⭕ 암기 완료! 오답노트에서도 해제되었습니다.');
-        } else {
-          showToast('⭕ 암기 완료 기록되었습니다.');
-        }
+        if (card.isWrong && document.getElementById('autoGraduateCheck').checked) card.isWrong = false;
+        saveToStorage();
+        showToast('⭕ 암기 완료 기록되었습니다.');
       } else {
         scoreX++;
         recordStudyLog(card, 'wrong');
         card.isWrong = true;
         card.wrongCount = (card.wrongCount || 0) + 1;
         saveToStorage();
-        showToast(`📕 오답노트에 등록되었습니다. (누적 오답 ${card.wrongCount}회)`);
+        showToast('📕 오답노트에 등록되었습니다.');
       }
-
       updateScoreBoard();
-      if (wrongOnly && !card.isWrong) {
-        applyFilters();
-      } else {
-        updateWrongBadges(card, document.getElementById('testWrongBadge'), document.getElementById('testWrongBtn'));
-      }
+      applyFilters();
     }
 
     function updateScoreBoard() {
@@ -3182,36 +3260,19 @@
     }
 
     function resetTestScore() {
-      scoreO = 0;
-      scoreX = 0;
-      updateScoreBoard();
-      showToast('점수를 초기화했습니다.');
+      scoreO = 0; scoreX = 0; updateScoreBoard();
     }
 
     function toggleAllCloze(reveal) {
-      const blanks = document.querySelectorAll('#clozeContent .cloze-blank');
-      blanks.forEach(el => {
-        el.classList.toggle('revealed', reveal);
-      });
+      document.querySelectorAll('#clozeContent .cloze-blank').forEach(el => el.classList.toggle('revealed', reveal));
     }
 
-    /* ================= 📊 엑셀 / CSV 대량 관리 ================= */
-    function openCsvModal() {
-      clearCsvInput();
-      document.getElementById('csvModal').classList.add('open');
-    }
-
-    function closeCsvModal() {
-      document.getElementById('csvModal').classList.remove('open');
-    }
-
-    function closeCsvModalOnBackdrop(e) {
-      if (e.target.id === 'csvModal') closeCsvModal();
-    }
-
+    /* ================= CSV 및 월간 통계 & 목록 관리 ================= */
+    function openCsvModal() { clearCsvInput(); document.getElementById('csvModal').classList.add('open'); }
+    function closeCsvModal() { document.getElementById('csvModal').classList.remove('open'); }
+    function closeCsvModalOnBackdrop(e) { if (e.target.id === 'csvModal') closeCsvModal(); }
     function clearCsvInput() {
       document.getElementById('csvFileInput').value = '';
-      document.getElementById('csvFileNameLabel').textContent = '선택된 파일 없음';
       document.getElementById('csvPasteArea').value = '';
       pendingCsvCards = [];
       document.getElementById('csvPreviewContainer').style.display = 'none';
@@ -3220,72 +3281,41 @@
 
     function escapeCsvField(val) {
       const str = String(val ?? '');
-      if (/[",\r\n]/.test(str)) {
-        return '"' + str.replace(/"/g, '""') + '"';
-      }
-      return str;
+      return /[",\r\n]/.test(str) ? '"' + str.replace(/"/g, '""') + '"' : str;
     }
 
     function downloadCsvTemplate() {
       const rows = [
         ['과목', '제목', '내용', '중요도', '즐겨찾기', '오답노트'],
-        ['사회·문화', '고전사회학자 - 마르크스', '"생산력과 생산관계의 모순" - "토대"가 "상부구조"의 형태를 규정한다.\n"분업"에 따른 "노동소외"와 "인간소외"를 비판', '3', 'N', 'N'],
-        ['경제', '수요의 가격탄력성', '가격 변화율에 대한 [수요량 변화율]의 크기.', '3', 'Y', 'N']
+        ['사회·문화', '고전사회학자 - 마르크스', '"생산력과 생산관계의 모순" - "토대"가 "상부구조"의 형태를 규정', '3', 'N', 'N']
       ];
       const csvContent = '\uFEFF' + rows.map(r => r.map(escapeCsvField).join(',')).join('\r\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = 'flashcards_sample_template.csv';
+      a.href = URL.createObjectURL(blob);
+      a.download = 'flashcards_template.csv';
       a.click();
-      URL.revokeObjectURL(url);
-      showToast('📄 샘플 CSV 양식이 다운로드되었습니다.');
     }
 
     function exportCardsToCsv() {
-      if (cards.length === 0) {
-        showToast('내보낼 카드가 없습니다.');
-        return;
-      }
       const header = ['과목', '제목', '내용', '중요도', '즐겨찾기', '오답노트', '누적오답횟수'];
-      const rows = cards.map(c => [
-        c.subject,
-        c.title,
-        c.content,
-        c.importance,
-        c.favorite ? 'Y' : 'N',
-        c.isWrong ? 'Y' : 'N',
-        c.wrongCount || 0
-      ]);
+      const rows = cards.map(c => [c.subject, c.title, c.content, c.importance, c.favorite ? 'Y' : 'N', c.isWrong ? 'Y' : 'N', c.wrongCount || 0]);
       const csvContent = '\uFEFF' + [header, ...rows].map(r => r.map(escapeCsvField).join(',')).join('\r\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const dateStr = getTodayDateStr().replace(/-/g, '');
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `flashcards_export_${dateStr}.csv`;
+      a.href = URL.createObjectURL(blob);
+      a.download = `flashcards_export_${getTodayDateStr().replace(/-/g, '')}.csv`;
       a.click();
-      URL.revokeObjectURL(url);
-      showToast(`📤 총 ${cards.length}장의 카드를 CSV로 내보냈습니다.`);
     }
 
     function handleCsvFileSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
-      document.getElementById('csvFileNameLabel').textContent = file.name;
-
       const reader = new FileReader();
       reader.onload = function(e) {
-        const buffer = e.target.result;
         let decodedText = '';
-        try {
-          const utf8Decoder = new TextDecoder('utf-8', { fatal: true });
-          decodedText = utf8Decoder.decode(buffer);
-        } catch (err) {
-          const eucKrDecoder = new TextDecoder('euc-kr');
-          decodedText = eucKrDecoder.decode(buffer);
-        }
+        try { decodedText = new TextDecoder('utf-8', { fatal: true }).decode(e.target.result); }
+        catch (err) { decodedText = new TextDecoder('euc-kr').decode(e.target.result); }
         document.getElementById('csvPasteArea').value = decodedText;
         parseCsvInputPreview();
       };
@@ -3295,205 +3325,75 @@
     function parseDelimitedText(rawText) {
       const text = rawText.replace(/^\uFEFF/, '').trim();
       if (!text) return [];
-
-      const firstLineEnd = text.indexOf('\n');
-      const firstLine = firstLineEnd > -1 ? text.slice(0, firstLineEnd) : text;
-      const tabCount = (firstLine.match(/\t/g) || []).length;
-      const commaCount = (firstLine.match(/,/g) || []).length;
-      const delimiter = tabCount > commaCount ? '\t' : ',';
-
+      const firstLine = text.split('\n')[0];
+      const delimiter = (firstLine.match(/\t/g) || []).length > (firstLine.match(/,/g) || []).length ? '\t' : ',';
       const rows = [];
-      let currentRow = [];
-      let currentVal = '';
-      let inQuotes = false;
-
+      let currentRow = [], currentVal = '', inQuotes = false;
       for (let i = 0; i < text.length; i++) {
-        const ch = text[i];
-        const nextCh = text[i + 1];
-
+        const ch = text[i], nextCh = text[i + 1];
         if (inQuotes) {
-          if (ch === '"' && nextCh === '"') {
-            currentVal += '"';
-            i++;
-          } else if (ch === '"') {
-            inQuotes = false;
-          } else {
-            currentVal += ch;
-          }
+          if (ch === '"' && nextCh === '"') { currentVal += '"'; i++; }
+          else if (ch === '"') inQuotes = false;
+          else currentVal += ch;
         } else {
-          if (ch === '"') {
-            inQuotes = true;
-          } else if (ch === delimiter) {
-            currentRow.push(currentVal.trim());
-            currentVal = '';
-          } else if (ch === '\r' && nextCh === '\n') {
-            currentRow.push(currentVal.trim());
-            rows.push(currentRow);
-            currentRow = [];
-            currentVal = '';
-            i++;
-          } else if (ch === '\n' || ch === '\r') {
-            currentRow.push(currentVal.trim());
-            rows.push(currentRow);
-            currentRow = [];
-            currentVal = '';
-          } else {
-            currentVal += ch;
-          }
+          if (ch === '"') inQuotes = true;
+          else if (ch === delimiter) { currentRow.push(currentVal.trim()); currentVal = ''; }
+          else if (ch === '\r' && nextCh === '\n') { currentRow.push(currentVal.trim()); rows.push(currentRow); currentRow = []; currentVal = ''; i++; }
+          else if (ch === '\n' || ch === '\r') { currentRow.push(currentVal.trim()); rows.push(currentRow); currentRow = []; currentVal = ''; }
+          else currentVal += ch;
         }
       }
-      if (currentVal.length > 0 || currentRow.length > 0) {
-        currentRow.push(currentVal.trim());
-        rows.push(currentRow);
-      }
-
-      return rows.filter(r => r.some(cell => cell !== ''));
-    }
-
-    function parseImportanceValue(val) {
-      if (!val) return 2;
-      const s = String(val).trim();
-      if (s === '3' || s.includes('상') || s.includes('★★★')) return 3;
-      if (s === '1' || s.includes('하') || s === '★' || s.includes('★☆☆')) return 1;
-      return 2;
-    }
-
-    function parseBooleanFlag(val) {
-      if (!val) return false;
-      const s = String(val).trim().toUpperCase();
-      return ['Y', 'YES', 'TRUE', '1', 'O', '⭐', '📕', '체크'].includes(s);
+      if (currentVal.length > 0 || currentRow.length > 0) { currentRow.push(currentVal.trim()); rows.push(currentRow); }
+      return rows.filter(r => r.some(c => c !== ''));
     }
 
     function parseCsvInputPreview() {
-      const rawText = document.getElementById('csvPasteArea').value;
-      const rows = parseDelimitedText(rawText);
+      const rows = parseDelimitedText(document.getElementById('csvPasteArea').value);
       const previewContainer = document.getElementById('csvPreviewContainer');
-      const tbody = document.getElementById('csvPreviewTbody');
-      const countEl = document.getElementById('csvPreviewCount');
       const commitBtn = document.getElementById('csvCommitBtn');
+      if (rows.length === 0) { previewContainer.style.display = 'none'; commitBtn.disabled = true; return; }
 
-      if (rows.length === 0) {
-        pendingCsvCards = [];
-        previewContainer.style.display = 'none';
-        commitBtn.disabled = true;
-        return;
-      }
-
-      let startIdx = 0;
-      const firstRowJoined = rows[0].join(' ').toLowerCase();
-      if (
-        firstRowJoined.includes('과목') ||
-        firstRowJoined.includes('제목') ||
-        firstRowJoined.includes('subject') ||
-        firstRowJoined.includes('title')
-      ) {
-        startIdx = 1;
-      }
-
+      let startIdx = rows[0].join(' ').toLowerCase().match(/과목|제목|subject|title/) ? 1 : 0;
       const parsed = [];
       for (let i = startIdx; i < rows.length; i++) {
         const cols = rows[i];
         if (cols.length < 2) continue;
-
-        let subject = '기본 과목';
-        let title = '';
-        let content = '';
-        let importance = 2;
-        let favorite = false;
-        let isWrong = false;
-
-        if (cols.length === 2) {
-          subject = selectedSubject !== '전체' ? selectedSubject : '기본 과목';
-          title = cols[0];
-          content = cols[1];
-        } else {
-          subject = cols[0] || '미분류';
-          title = cols[1] || '';
-          content = cols[2] || '';
-          importance = parseImportanceValue(cols[3]);
-          favorite = parseBooleanFlag(cols[4]);
-          isWrong = parseBooleanFlag(cols[5]);
-        }
-
-        if (title && content) {
-          parsed.push({ subject, title, content, importance, favorite, isWrong });
-        }
+        const subject = cols.length === 2 ? (selectedSubject !== '전체' ? selectedSubject : '기본 과목') : (cols[0] || '미분류');
+        const title = cols.length === 2 ? cols[0] : cols[1];
+        const content = cols.length === 2 ? cols[1] : cols[2];
+        const importance = cols[3] === '3' ? 3 : (cols[3] === '1' ? 1 : 2);
+        if (title && content) parsed.push({ subject, title, content, importance, favorite: false, isWrong: false });
       }
-
       pendingCsvCards = parsed;
-
-      if (parsed.length === 0) {
-        previewContainer.style.display = 'none';
-        commitBtn.disabled = true;
-        return;
-      }
-
+      if (parsed.length === 0) { previewContainer.style.display = 'none'; commitBtn.disabled = true; return; }
       previewContainer.style.display = 'block';
-      countEl.textContent = `인식된 카드: 총 ${parsed.length}장`;
+      document.getElementById('csvPreviewCount').textContent = `인식된 카드: 총 ${parsed.length}장`;
       commitBtn.disabled = false;
       commitBtn.textContent = `${parsed.length}장 대량 등록 실행`;
-
-      tbody.innerHTML = parsed.slice(0, 20).map(item => `
-        <tr>
-          <td><b>${escapeHtml(item.subject)}</b></td>
-          <td>${escapeHtml(item.title)}</td>
-          <td style="white-space:pre-wrap; color:var(--text-sub);">${escapeHtml(item.content.slice(0, 80))}</td>
-          <td>${getImpLabel(item.importance)}</td>
-        </tr>
-      `).join('');
+      document.getElementById('csvPreviewTbody').innerHTML = parsed.slice(0, 15).map(item =>
+        `<tr><td><b>${escapeHtml(item.subject)}</b></td><td>${escapeHtml(item.title)}</td><td>${escapeHtml(item.content.slice(0, 60))}</td><td>${getImpLabel(item.importance)}</td></tr>`
+      ).join('');
     }
 
     function commitCsvImport() {
       if (pendingCsvCards.length === 0) return;
-
       const dupMode = document.getElementById('csvDuplicateMode').value;
-      let addedCount = 0;
-      let updatedCount = 0;
-
       pendingCsvCards.forEach((item, idx) => {
-        const existingIdx = cards.findIndex(
-          c => c.subject.trim() === item.subject.trim() && c.title.trim() === item.title.trim()
-        );
-
+        const existingIdx = cards.findIndex(c => c.subject.trim() === item.subject.trim() && c.title.trim() === item.title.trim());
         if (existingIdx > -1 && dupMode !== 'add') {
-          if (dupMode === 'update') {
-            const prev = cards[existingIdx];
-            cards[existingIdx] = {
-              ...prev,
-              content: item.content,
-              importance: item.importance,
-              favorite: item.favorite || prev.favorite,
-              isWrong: item.isWrong || prev.isWrong,
-              wrongCount: item.isWrong && (!prev.wrongCount || prev.wrongCount === 0) ? 1 : (prev.wrongCount || 0)
-            };
-            updatedCount++;
-          }
+          if (dupMode === 'update') cards[existingIdx] = { ...cards[existingIdx], content: item.content, importance: item.importance };
         } else {
           cards.unshift({
-            id: 'csv-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).slice(2, 6),
-            subject: item.subject.trim(),
-            title: item.title.trim(),
-            content: item.content.trim(),
-            importance: item.importance,
-            favorite: item.favorite,
-            isWrong: item.isWrong,
-            wrongCount: item.isWrong ? 1 : 0,
-            imageData: null,
-            imagePos: 'back',
-            createdAt: Date.now() + idx
+            id: 'csv-' + Date.now() + '-' + idx, subject: item.subject.trim(), title: item.title.trim(),
+            content: item.content.trim(), importance: item.importance, favorite: false, isWrong: false, wrongCount: 0,
+            imageData: null, imagePos: 'back', createdAt: Date.now() + idx
           });
-          addedCount++;
         }
       });
-
-      saveToStorage();
-      renderSubjects();
-      applyFilters();
-      closeCsvModal();
-      showToast(`✅ 신규 ${addedCount}장 추가, ${updatedCount}장 업데이트 완료!`);
+      saveToStorage(); renderSubjects(); applyFilters(); closeCsvModal();
+      showToast('✅ CSV 대량 등록이 완료되었습니다!');
     }
 
-    /* ================= 📊 월간 통계 대시보드 ================= */
     function changeStatsMonth(delta) {
       const [y, m] = currentStatsMonth.split('-').map(Number);
       const d = new Date(y, m - 1 + delta, 1);
@@ -3502,36 +3402,21 @@
       renderStatsDashboard();
     }
 
-    function onMonthInputPick(val) {
-      if (!val) return;
-      currentStatsMonth = val;
-      renderStatsDashboard();
-    }
-
-    function setStatsSubjectFilter(sub) {
-      statsSubjectFilter = statsSubjectFilter === sub ? 'ALL' : sub;
-      renderStatsDashboard();
-    }
-
+    function onMonthInputPick(val) { if (val) { currentStatsMonth = val; renderStatsDashboard(); } }
+    function setStatsSubjectFilter(sub) { statsSubjectFilter = statsSubjectFilter === sub ? 'ALL' : sub; renderStatsDashboard(); }
     function clearStudyLogs() {
       if (!confirm('모든 월간 학습 기록을 초기화하시겠습니까?')) return;
-      studyLogs = [];
-      saveLogsToStorage();
-      renderStatsDashboard();
-      showToast('월간 학습 통계 기록을 초기화했습니다.');
+      studyLogs = []; saveLogsToStorage(); renderStatsDashboard();
     }
 
     function renderStatsDashboard() {
       const [yearStr, monthStr] = currentStatsMonth.split('-');
       document.getElementById('statsMonthLabel').textContent = `${yearStr}년 ${Number(monthStr)}월`;
-      document.getElementById('statusInfo').textContent = `${yearStr}년 ${Number(monthStr)}월 학습 리포트`;
-
       const monthLogs = studyLogs.filter(l => l.monthStr === currentStatsMonth);
       const totalStudyEvents = monthLogs.length;
       const studiedCardIds = new Set(monthLogs.map(l => l.cardId));
       const uniqueStudiedCardsCount = cards.filter(c => studiedCardIds.has(c.id)).length;
       const progressPct = cards.length > 0 ? Math.round((uniqueStudiedCardsCount / cards.length) * 100) : 0;
-
       const correctLogsCount = monthLogs.filter(l => l.type === 'correct').length;
       const wrongLogsCount = monthLogs.filter(l => l.type === 'wrong').length;
       const totalTests = correctLogsCount + wrongLogsCount;
@@ -3539,18 +3424,13 @@
 
       const subjectMap = new Map();
       cards.forEach(c => {
-        if (!subjectMap.has(c.subject)) {
-          subjectMap.set(c.subject, { subject: c.subject, total: 0, view: 0, correct: 0, wrong: 0, cardCount: 0 });
-        }
+        if (!subjectMap.has(c.subject)) subjectMap.set(c.subject, { subject: c.subject, total: 0, view: 0, correct: 0, wrong: 0, cardCount: 0 });
         subjectMap.get(c.subject).cardCount++;
       });
-
       monthLogs.forEach(log => {
         const latestCard = cards.find(c => c.id === log.cardId);
         const subName = latestCard ? latestCard.subject : (log.subject || '미분류');
-        if (!subjectMap.has(subName)) {
-          subjectMap.set(subName, { subject: subName, total: 0, view: 0, correct: 0, wrong: 0, cardCount: 0 });
-        }
+        if (!subjectMap.has(subName)) subjectMap.set(subName, { subject: subName, total: 0, view: 0, correct: 0, wrong: 0, cardCount: 0 });
         const entry = subjectMap.get(subName);
         entry.total++;
         if (log.type === 'correct') entry.correct++;
@@ -3562,50 +3442,26 @@
       const topSub = subjectStatsArr.length > 0 && subjectStatsArr[0].total > 0 ? subjectStatsArr[0] : null;
 
       document.getElementById('kpiTotalCount').textContent = `${totalStudyEvents}회`;
-      document.getElementById('kpiTotalSub').textContent = `암기열람 ${monthLogs.filter(l => l.type === 'view').length}회 · 테스트 ${totalTests}회`;
       document.getElementById('kpiUniqueCards').textContent = `${uniqueStudiedCardsCount} / ${cards.length}장`;
       document.getElementById('kpiUniqueSub').textContent = `전체 카드 대비 ${progressPct}% 학습`;
       document.getElementById('kpiAccuracy').textContent = totalTests > 0 ? `${accuracyPct}%` : '-';
-      document.getElementById('kpiAccuracySub').textContent = `정답 ${correctLogsCount}회 · 오답 ${wrongLogsCount}회`;
       document.getElementById('kpiTopSubject').textContent = topSub ? topSub.subject : '기록 없음';
-      document.getElementById('kpiTopSubjectSub').textContent = topSub ? `이번 달 총 ${topSub.total}회 학습` : '학습을 시작해보세요';
 
       const propBar = document.getElementById('subjectProportionBar');
-      const subChartList = document.getElementById('subjectChartList');
-
-      if (totalStudyEvents === 0) {
-        propBar.innerHTML = `<div style="width:100%; background:#e2e8f0;"></div>`;
-      } else {
-        propBar.innerHTML = subjectStatsArr.filter(s => s.total > 0).map((s, idx) => {
-          const pct = (s.total / totalStudyEvents) * 100;
-          const color = SUBJECT_PALETTE[idx % SUBJECT_PALETTE.length];
-          return `<div class="proportion-segment" style="width:${pct}%; background:${color};"></div>`;
-        }).join('');
-      }
+      propBar.innerHTML = totalStudyEvents === 0
+        ? `<div style="width:100%; background:#e2e8f0;"></div>`
+        : subjectStatsArr.filter(s => s.total > 0).map((s, idx) => `<div class="proportion-segment" style="width:${(s.total / totalStudyEvents) * 100}%; background:${SUBJECT_PALETTE[idx % SUBJECT_PALETTE.length]};"></div>`).join('');
 
       const maxSubTotal = Math.max(1, ...subjectStatsArr.map(s => s.total));
-      subChartList.innerHTML = subjectStatsArr.map((s, idx) => {
+      document.getElementById('subjectChartList').innerHTML = subjectStatsArr.map((s, idx) => {
         const color = SUBJECT_PALETTE[idx % SUBJECT_PALETTE.length];
-        const sharePct = totalStudyEvents > 0 ? Math.round((s.total / totalStudyEvents) * 100) : 0;
-        const barWidthPct = (s.total / maxSubTotal) * 100;
-        const isSelected = statsSubjectFilter === s.subject;
-
         return `
-          <div class="subject-chart-row ${isSelected ? 'selected-sub' : ''}" onclick="setStatsSubjectFilter('${escapeHtml(s.subject)}')">
+          <div class="subject-chart-row ${statsSubjectFilter === s.subject ? 'selected-sub' : ''}" onclick="setStatsSubjectFilter('${escapeHtml(s.subject)}')">
             <div class="subject-row-top">
-              <div>
-                <span class="subject-dot" style="background:${color};"></span>
-                <span>${escapeHtml(s.subject)}</span>
-                <span style="font-size:0.76rem; color:var(--text-sub);">(${s.cardCount}장)</span>
-              </div>
-              <div>
-                <span style="color:${color}; font-weight:800;">${s.total}회</span>
-                <span style="font-size:0.78rem; color:var(--text-sub);"> (${sharePct}%)</span>
-              </div>
+              <div><span class="subject-dot" style="background:${color};"></span><span>${escapeHtml(s.subject)} (${s.cardCount}장)</span></div>
+              <span style="color:${color}; font-weight:800;">${s.total}회</span>
             </div>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:${barWidthPct}%; background:${color};"></div>
-            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:${(s.total / maxSubTotal) * 100}%; background:${color};"></div></div>
           </div>
         `;
       }).join('');
@@ -3616,117 +3472,62 @@
         const dayNum = Number(l.dateStr.slice(8, 10));
         if (dayNum >= 1 && dayNum <= daysInMonth) dailyCounts[dayNum]++;
       });
-
-      document.getElementById('activeDaysCount').textContent = `이번 달 학습일: 총 ${dailyCounts.filter(c => c > 0).length}일`;
       const maxDaily = Math.max(4, ...dailyCounts);
       let dailyHtml = '';
       for (let d = 1; d <= daysInMonth; d++) {
         const cnt = dailyCounts[d];
-        const heightPct = Math.round((cnt / maxDaily) * 85);
-        dailyHtml += `
-          <div class="daily-col">
-            <span class="daily-count-label">${cnt > 0 ? cnt : ''}</span>
-            <div class="daily-bar ${cnt === 0 ? 'zero' : ''}" style="height:${heightPct}%;"></div>
-            <span class="daily-day-label">${d}</span>
-          </div>
-        `;
+        dailyHtml += `<div class="daily-col"><span class="daily-count-label">${cnt > 0 ? cnt : ''}</span><div class="daily-bar ${cnt === 0 ? 'zero' : ''}" style="height:${Math.round((cnt / maxDaily) * 85)}%;"></div><span class="daily-day-label">${d}</span></div>`;
       }
       document.getElementById('dailyChartWrapper').innerHTML = dailyHtml;
 
-      document.getElementById('statsContentFilterBadge').textContent =
-        statsSubjectFilter === 'ALL' ? '전체 과목 (클릭 시 해제)' : `${statsSubjectFilter} ✕`;
-
       const contentMode = document.getElementById('statsContentFilterMode').value;
       const cardStatsMap = new Map();
-      cards.forEach(c => {
-        cardStatsMap.set(c.id, {
-          cardId: c.id, subject: c.subject, title: c.title,
-          total: 0, view: 0, correct: 0, wrong: 0, lastDate: '-'
-        });
-      });
-
+      cards.forEach(c => cardStatsMap.set(c.id, { cardId: c.id, subject: c.subject, title: c.title, total: 0, view: 0, correct: 0, wrong: 0, lastDate: '-' }));
       monthLogs.forEach(l => {
         if (!cardStatsMap.has(l.cardId)) return;
         const st = cardStatsMap.get(l.cardId);
         st.total++;
-        if (l.type === 'correct') st.correct++;
-        else if (l.type === 'wrong') st.wrong++;
-        else st.view++;
+        if (l.type === 'correct') st.correct++; else if (l.type === 'wrong') st.wrong++; else st.view++;
         if (st.lastDate === '-' || l.dateStr > st.lastDate) st.lastDate = l.dateStr;
       });
-
       let contentList = Array.from(cardStatsMap.values());
       if (statsSubjectFilter !== 'ALL') contentList = contentList.filter(i => i.subject === statsSubjectFilter);
       if (contentMode === 'studied') contentList = contentList.filter(i => i.total > 0);
       else if (contentMode === 'unstudied') contentList = contentList.filter(i => i.total === 0);
-
-      contentList.sort((a, b) => b.total - a.total || b.wrong - a.wrong);
+      contentList.sort((a, b) => b.total - a.total);
       const maxCardTotal = Math.max(1, ...contentList.map(i => i.total));
-      const contentListEl = document.getElementById('contentStatsList');
-
-      if (contentList.length === 0) {
-        contentListEl.innerHTML = `<div style="text-align:center; padding:24px; color:var(--text-sub);">내역이 없습니다.</div>`;
-      } else {
-        contentListEl.innerHTML = contentList.map((item, idx) => `
-          <div class="content-stat-item">
-            <div class="content-stat-top">
-              <div>
-                <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">#${idx + 1}</span>
-                <span class="subject-badge">${escapeHtml(item.subject)}</span>
-                <span class="content-stat-title">${escapeHtml(item.title)}</span>
-              </div>
-              <span style="font-weight:800; color:var(--primary);">총 ${item.total}회</span>
-            </div>
-            <div class="bar-track" style="height:7px;">
-              <div class="bar-fill" style="width:${(item.total / maxCardTotal) * 100}%; background:var(--primary);"></div>
-            </div>
-            <div class="content-stat-meta">
-              <div class="stat-type-pills">
-                <span class="stat-pill pill-view">📖 열람 ${item.view}</span>
-                <span class="stat-pill pill-correct">⭕ 정답 ${item.correct}</span>
-                <span class="stat-pill pill-wrong">❌ 오답 ${item.wrong}</span>
-              </div>
-              <span>최근: ${item.lastDate}</span>
-            </div>
+      document.getElementById('contentStatsList').innerHTML = contentList.map((item, idx) => `
+        <div class="content-stat-item">
+          <div class="content-stat-top">
+            <div><span style="font-weight:800; color:var(--primary);">#${idx + 1}</span> <span class="subject-badge">${escapeHtml(item.subject)}</span> <span class="content-stat-title">${escapeHtml(item.title)}</span></div>
+            <span style="font-weight:800; color:var(--primary);">총 ${item.total}회</span>
           </div>
-        `).join('');
-      }
+          <div class="bar-track" style="height:7px;"><div class="bar-fill" style="width:${(item.total / maxCardTotal) * 100}%; background:var(--primary);"></div></div>
+        </div>
+      `).join('');
     }
 
-    /* ================= 목록 렌더링 및 카드 관리 ================= */
     function renderListCards() {
-      const listSec = document.getElementById('listSection');
       const curMonth = getTodayMonthStr();
-      listSec.innerHTML = filteredCards.map(card => {
-        const wrongBadgeHtml = (card.isWrong || card.wrongCount > 0)
-          ? `<span class="wrong-count-badge">${card.isWrong ? `📕 오답 (${card.wrongCount || 1}회)` : `오답이력 ${card.wrongCount}회`}</span>`
-          : '';
-        const monthCnt = getCardMonthStudyCount(card.id, curMonth);
-        const mediaHtml = card.imageData
-          ? `<div class="card-media-box"><img class="card-media-img" src="${card.imageData}" alt="카드 이미지" onclick="openLightbox(this.src)" /></div>`
-          : '';
-        return `
-          <div class="list-card">
-            <div class="card-header">
-              <div class="badge-group">
-                <span class="subject-badge">${escapeHtml(card.subject)}</span>
-                <span class="imp-badge imp-${card.importance}">${getImpLabel(card.importance)}</span>
-                <span class="study-count-badge">이달 학습 ${monthCnt}회</span>
-                ${wrongBadgeHtml}
-              </div>
-              <div class="card-actions-top">
-                <button class="icon-btn ${card.isWrong ? 'wrong-on' : ''}" onclick="toggleWrongById('${card.id}')">📕</button>
-                <button class="icon-btn ${card.favorite ? 'fav-on' : ''}" onclick="toggleFavById('${card.id}')">${card.favorite ? '⭐' : '☆'}</button>
-                <button class="icon-btn" onclick="openEditModalById('${card.id}')">✏️</button>
-                <button class="icon-btn" onclick="deleteCardById('${card.id}')">🗑️</button>
-              </div>
+      document.getElementById('listSection').innerHTML = filteredCards.map(card => `
+        <div class="list-card">
+          <div class="card-header">
+            <div class="badge-group">
+              <span class="subject-badge">${escapeHtml(card.subject)}</span>
+              <span class="imp-badge imp-${card.importance}">${getImpLabel(card.importance)}</span>
+              <span class="study-count-badge">이달 학습 ${getCardMonthStudyCount(card.id, curMonth)}회</span>
             </div>
-            <div class="list-card-title">[${escapeHtml(card.subject)} - ${escapeHtml(card.title)}] ${getImpStarsOnly(card.importance)}</div>
-            ${mediaHtml}
-            <div class="list-card-content">${renderRichContent(card.content, { mode: 'normal' })}</div>
+            <div class="card-actions-top">
+              <button class="icon-btn ${card.isWrong ? 'wrong-on' : ''}" onclick="toggleWrongById('${card.id}')">📕</button>
+              <button class="icon-btn ${card.favorite ? 'fav-on' : ''}" onclick="toggleFavById('${card.id}')">${card.favorite ? '⭐' : '☆'}</button>
+              <button class="icon-btn" onclick="openEditModalById('${card.id}')">✏️</button>
+              <button class="icon-btn" onclick="deleteCardById('${card.id}')">🗑️</button>
+            </div>
           </div>
-        `;
-      }).join('');
+          <div class="list-card-title">[${escapeHtml(card.subject)} - ${escapeHtml(card.title)}] ${getImpStarsOnly(card.importance)}</div>
+          <div class="list-card-content">${renderRichContent(card.content, { mode: 'normal' })}</div>
+        </div>
+      `).join('');
     }
 
     function prevCard() {
@@ -3738,10 +3539,7 @@
     function nextCard() {
       if (filteredCards.length === 0) return;
       const currentCard = filteredCards[currentIndex];
-      if (wrongOnly && currentCard && !currentCard.isWrong) {
-        applyFilters();
-        return;
-      }
+      if (wrongOnly && currentCard && !currentCard.isWrong) { applyFilters(); return; }
       currentIndex = (currentIndex + 1) % filteredCards.length;
       renderMainView();
     }
@@ -3752,139 +3550,82 @@
         const j = Math.floor(Math.random() * (i + 1));
         [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
       }
-      currentIndex = 0;
-      renderMainView();
-      showToast('순서를 랜덤으로 섞었습니다.');
+      currentIndex = 0; renderMainView();
     }
 
-    function toggleCurrentFav() {
-      const card = filteredCards[currentIndex];
-      if (card) toggleFavById(card.id);
-    }
-
+    function toggleCurrentFav() { const card = filteredCards[currentIndex]; if (card) toggleFavById(card.id); }
     function toggleFavById(id) {
       const target = cards.find(c => c.id === id);
       if (!target) return;
       target.favorite = !target.favorite;
-      saveToStorage();
-      applyFilters();
-      showToast(target.favorite ? '⭐ 즐겨찾기에 추가했습니다.' : '즐겨찾기에서 해제했습니다.');
+      saveToStorage(); applyFilters();
     }
 
-    function toggleCurrentWrong() {
-      const card = filteredCards[currentIndex];
-      if (card) toggleWrongById(card.id);
-    }
-
+    function toggleCurrentWrong() { const card = filteredCards[currentIndex]; if (card) toggleWrongById(card.id); }
     function toggleWrongById(id) {
       const target = cards.find(c => c.id === id);
       if (!target) return;
       target.isWrong = !target.isWrong;
-      if (target.isWrong && (!target.wrongCount || target.wrongCount === 0)) target.wrongCount = 1;
-      saveToStorage();
-      applyFilters();
-      showToast(target.isWrong ? '📕 오답노트에 추가했습니다.' : '🎓 오답노트에서 해제했습니다.');
+      if (target.isWrong && !target.wrongCount) target.wrongCount = 1;
+      saveToStorage(); applyFilters();
     }
 
     function wrapSelectedTextWithBrackets() {
       const textarea = document.getElementById('cardContentInput');
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      if (start === end) {
-        showToast('먼저 내용 입력창에서 빈칸으로 만들 단어를 드래그해 선택해주세요.');
-        return;
-      }
-      const selected = textarea.value.substring(start, end);
-      const wrapped = `[${selected}]`;
+      const start = textarea.selectionStart, end = textarea.selectionEnd;
+      if (start === end) return;
+      const wrapped = `[${textarea.value.substring(start, end)}]`;
       textarea.value = textarea.value.substring(0, start) + wrapped + textarea.value.substring(end);
       textarea.focus();
-      textarea.setSelectionRange(start, start + wrapped.length);
     }
 
     function populateSubjectSelect(selectedVal = '') {
       const select = document.getElementById('cardSubjectSelect');
-      const customInput = document.getElementById('customSubjectInput');
       const existing = Array.from(new Set(cards.map(c => c.subject.trim()).filter(Boolean)));
       if (existing.length === 0) existing.push('사회·문화');
-
-      select.innerHTML = existing.map(sub => `<option value="${escapeHtml(sub)}">${escapeHtml(sub)}</option>`).join('') +
-        `<option value="__NEW__">+ 새 과목 직접 입력...</option>`;
-
-      if (selectedVal && existing.includes(selectedVal)) {
-        select.value = selectedVal;
-        customInput.style.display = 'none';
-      } else if (selectedSubject !== '전체' && existing.includes(selectedSubject)) {
-        select.value = selectedSubject;
-        customInput.style.display = 'none';
-      } else {
-        select.value = existing[0];
-        customInput.style.display = 'none';
-      }
+      select.innerHTML = existing.map(sub => `<option value="${escapeHtml(sub)}">${escapeHtml(sub)}</option>`).join('') + `<option value="__NEW__">+ 새 과목 직접 입력...</option>`;
+      select.value = selectedVal && existing.includes(selectedVal) ? selectedVal : existing[0];
+      document.getElementById('customSubjectInput').style.display = 'none';
     }
 
     function handleSubjectSelectChange() {
-      const select = document.getElementById('cardSubjectSelect');
-      const customInput = document.getElementById('customSubjectInput');
-      if (select.value === '__NEW__') {
-        customInput.style.display = 'block';
-        customInput.focus();
-      } else {
-        customInput.style.display = 'none';
-      }
+      const isNew = document.getElementById('cardSubjectSelect').value === '__NEW__';
+      document.getElementById('customSubjectInput').style.display = isNew ? 'block' : 'none';
     }
 
     function openAddModal() {
       document.getElementById('modalTitle').textContent = '새 플래시카드 추가';
       document.getElementById('editCardId').value = '';
       populateSubjectSelect();
-      document.getElementById('customSubjectInput').value = '';
-      document.getElementById('cardImportance').value = '2';
       document.getElementById('cardTitleInput').value = '';
       document.getElementById('cardContentInput').value = '';
-      document.getElementById('cardImagePos').value = 'back';
-      currentEditingImageData = null;
-      updateModalImagePreview();
-      document.getElementById('cardFavoriteInput').checked = false;
-      document.getElementById('cardWrongInput').checked = false;
+      currentEditingImageData = null; updateModalImagePreview();
       document.getElementById('cardModal').classList.add('open');
     }
 
-    function openEditCurrentCard() {
-      const card = filteredCards[currentIndex];
-      if (card) openEditModalById(card.id);
-    }
-
+    function openEditCurrentCard() { const card = filteredCards[currentIndex]; if (card) openEditModalById(card.id); }
     function openEditModalById(id) {
       const card = cards.find(c => c.id === id);
       if (!card) return;
       document.getElementById('modalTitle').textContent = '플래시카드 편집';
       document.getElementById('editCardId').value = card.id;
       populateSubjectSelect(card.subject);
-      document.getElementById('customSubjectInput').value = '';
       document.getElementById('cardImportance').value = String(card.importance);
       document.getElementById('cardTitleInput').value = card.title;
       document.getElementById('cardContentInput').value = card.content;
-      document.getElementById('cardImagePos').value = card.imagePos || 'back';
-      currentEditingImageData = card.imageData || null;
-      updateModalImagePreview();
+      currentEditingImageData = card.imageData || null; updateModalImagePreview();
       document.getElementById('cardFavoriteInput').checked = Boolean(card.favorite);
       document.getElementById('cardWrongInput').checked = Boolean(card.isWrong);
       document.getElementById('cardModal').classList.add('open');
     }
 
-    function closeModal() {
-      document.getElementById('cardModal').classList.remove('open');
-    }
-
-    function closeModalOnBackdrop(e) {
-      if (e.target.id === 'cardModal') closeModal();
-    }
+    function closeModal() { document.getElementById('cardModal').classList.remove('open'); }
+    function closeModalOnBackdrop(e) { if (e.target.id === 'cardModal') closeModal(); }
 
     function saveCard() {
       const editId = document.getElementById('editCardId').value;
       const selectVal = document.getElementById('cardSubjectSelect').value;
-      const customSub = document.getElementById('customSubjectInput').value.trim();
-      const subject = selectVal === '__NEW__' ? customSub : selectVal;
+      const subject = selectVal === '__NEW__' ? document.getElementById('customSubjectInput').value.trim() : selectVal;
       const importance = Number(document.getElementById('cardImportance').value);
       const title = document.getElementById('cardTitleInput').value.trim();
       const content = document.getElementById('cardContentInput').value.trim();
@@ -3892,63 +3633,32 @@
       const favorite = document.getElementById('cardFavoriteInput').checked;
       const isWrong = document.getElementById('cardWrongInput').checked;
 
-      if (!subject || !title || (!content && !currentEditingImageData)) {
-        alert('과목, 제목, 내용을 입력해주세요.');
-        return;
-      }
+      if (!subject || !title || (!content && !currentEditingImageData)) return;
 
       if (editId) {
         const idx = cards.findIndex(c => c.id === editId);
-        if (idx > -1) {
-          const prevCount = cards[idx].wrongCount || 0;
-          cards[idx] = {
-            ...cards[idx], subject, importance, title, content,
-            imageData: currentEditingImageData, imagePos, favorite, isWrong,
-            wrongCount: isWrong && prevCount === 0 ? 1 : prevCount
-          };
-        }
-        showToast('카드가 수정되었습니다.');
+        if (idx > -1) cards[idx] = { ...cards[idx], subject, importance, title, content, imageData: currentEditingImageData, imagePos, favorite, isWrong };
       } else {
-        cards.unshift({
-          id: 'card-' + Date.now(), subject, importance, title, content,
-          imageData: currentEditingImageData, imagePos, favorite, isWrong,
-          wrongCount: isWrong ? 1 : 0, createdAt: Date.now()
-        });
-        selectedSubject = subject;
-        currentIndex = 0;
-        showToast('새 카드가 추가되었습니다.');
+        cards.unshift({ id: 'card-' + Date.now(), subject, importance, title, content, imageData: currentEditingImageData, imagePos, favorite, isWrong, wrongCount: isWrong ? 1 : 0, createdAt: Date.now() });
+        selectedSubject = subject; currentIndex = 0;
       }
-
-      saveToStorage();
-      renderSubjects();
-      applyFilters();
-      closeModal();
+      saveToStorage(); renderSubjects(); applyFilters(); closeModal();
+      showToast('저장되었습니다.');
     }
 
-    function deleteCurrentCard() {
-      const card = filteredCards[currentIndex];
-      if (card) deleteCardById(card.id);
-    }
-
+    function deleteCurrentCard() { const card = filteredCards[currentIndex]; if (card) deleteCardById(card.id); }
     function deleteCardById(id) {
-      if (!confirm('이 플래시카드를 정말 삭제하시겠습니까?')) return;
+      if (!confirm('삭제하시겠습니까?')) return;
       cards = cards.filter(c => c.id !== id);
-      saveToStorage();
-      renderSubjects();
-      applyFilters();
-      showToast('카드가 삭제되었습니다.');
+      saveToStorage(); renderSubjects(); applyFilters();
     }
 
     function exportBackup() {
-      const payload = { version: 4, exportedAt: new Date().toISOString(), cards, studyLogs };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
+      const blob = new Blob([JSON.stringify({ version: 5, cards, studyLogs }, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
-      a.href = url;
+      a.href = URL.createObjectURL(blob);
       a.download = `flashcards_backup_${getTodayDateStr().replace(/-/g, '')}.json`;
       a.click();
-      URL.revokeObjectURL(url);
-      showToast('백업 파일이 다운로드되었습니다.');
     }
 
     function importBackup(event) {
@@ -3958,32 +3668,11 @@
       reader.onload = function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
-          const importedCards = Array.isArray(parsed) ? parsed : (parsed.cards || []);
-          const importedLogs = Array.isArray(parsed) ? [] : (parsed.studyLogs || []);
-          if (!Array.isArray(importedCards)) throw new Error('Invalid');
-          if (confirm(`카드 ${importedCards.length}장을 복원하시겠습니까?`)) {
-            const cardMap = new Map();
-            cards.forEach(c => cardMap.set(c.id, c));
-            importedCards.forEach(c => {
-              if (c.title) cardMap.set(c.id || 'imp-' + Math.random(), c);
-            });
-            cards = Array.from(cardMap.values());
-            if (importedLogs.length > 0) {
-              const logMap = new Map();
-              studyLogs.forEach(l => logMap.set(l.id, l));
-              importedLogs.forEach(l => logMap.set(l.id, l));
-              studyLogs = Array.from(logMap.values());
-              saveLogsToStorage();
-            }
-            saveToStorage();
-            renderSubjects();
-            applyFilters();
-            showToast('복원이 완료되었습니다.');
-          }
-        } catch (err) {
-          alert('올바른 JSON 백업 파일이 아닙니다.');
-        }
-        event.target.value = '';
+          cards = Array.isArray(parsed) ? parsed : (parsed.cards || []);
+          studyLogs = Array.isArray(parsed) ? [] : (parsed.studyLogs || []);
+          saveToStorage(); saveLogsToStorage(); renderSubjects(); applyFilters();
+          showToast('복원 완료!');
+        } catch (err) { alert('잘못된 파일입니다.'); }
       };
       reader.readAsText(file);
     }
@@ -3997,29 +3686,8 @@
     }
 
     function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeLightbox();
-      const anyModalOpen = document.querySelectorAll('.modal-backdrop.open').length > 0;
-      const isInputFocused = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
-      if (anyModalOpen || isInputFocused) return;
-
-      if (viewMode === 'study' && e.code === 'Space') {
-        e.preventDefault();
-        flipCard();
-      } else if (e.code === 'ArrowRight' && (viewMode === 'study' || viewMode === 'test')) {
-        nextCard();
-      } else if (e.code === 'ArrowLeft' && (viewMode === 'study' || viewMode === 'test')) {
-        prevCard();
-      }
-    });
 
     initApp();
   </script>
