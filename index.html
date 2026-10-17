@@ -65,6 +65,7 @@
       line-height: 1.5;
       padding-bottom: 95px;
       transition: background-color 0.2s ease, color 0.2s ease;
+      overflow-x: hidden;
     }
 
     header {
@@ -423,6 +424,25 @@
       font-weight: 600;
     }
 
+    /* 스와이프 카드 전환 애니메이션 */
+    @keyframes swipeNextAnim {
+      0% { transform: translateX(28px); opacity: 0.45; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes swipePrevAnim {
+      0% { transform: translateX(-28px); opacity: 0.45; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+
+    .swipe-next-effect {
+      animation: swipeNextAnim 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .swipe-prev-effect {
+      animation: swipePrevAnim 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
     /* 플래시카드 학습 모드 */
     .study-container {
       display: flex;
@@ -436,6 +456,7 @@
       height: 390px;
       perspective: 1200px;
       cursor: pointer;
+      touch-action: pan-y;
     }
 
     .flashcard-inner {
@@ -672,7 +693,7 @@
 
     .card-footer {
       text-align: center;
-      font-size: 0.78rem;
+      font-size: 0.77rem;
       color: var(--text-sub);
     }
 
@@ -770,6 +791,7 @@
       flex-direction: column;
       gap: 16px;
       min-height: 320px;
+      touch-action: pan-y;
     }
 
     .typing-prompt-box {
@@ -1915,7 +1937,7 @@
               <div id="studyTitle" class="card-title-text">카드가 없습니다</div>
               <div id="studyMediaFront" class="card-media-box" style="display:none;" onclick="event.stopPropagation()"></div>
             </div>
-            <div class="card-footer">👆 카드를 터치하면 뒷면(내용·표·사진)을 확인하고 학습 1회가 기록됩니다</div>
+            <div class="card-footer">👆 터치하면 뒤집기 · ↔️ 좌우 스와이프로 이전/다음 카드 이동</div>
           </div>
 
           <div class="card-face card-back">
@@ -1937,16 +1959,16 @@
               <div id="studyMediaBack" class="card-media-box" style="display:none;" onclick="event.stopPropagation()"></div>
               <div id="studyContent" class="card-content-text">내용</div>
             </div>
-            <div class="card-footer">👆 다시 터치하면 앞면으로 돌아갑니다</div>
+            <div class="card-footer">👆 터치하면 앞면으로 · ↔️ 좌우 스와이프로 이전/다음 카드 이동</div>
           </div>
         </div>
       </div>
 
       <div class="study-nav">
-        <button class="btn nav-btn" onclick="prevCard()">◀ 이전</button>
+        <button class="btn nav-btn" onclick="prevCard('prev')">◀ 이전</button>
         <button class="btn btn-success" onclick="manualCheckStudy()">✅ 학습 체크(+1)</button>
         <button class="btn" onclick="shuffleCards()">🔀 섞기</button>
-        <button class="btn nav-btn" onclick="nextCard()">다음 ▶</button>
+        <button class="btn nav-btn" onclick="nextCard('next')">다음 ▶</button>
       </div>
     </section>
 
@@ -1968,7 +1990,7 @@
         </div>
       </div>
 
-      <div class="test-card">
+      <div id="testCardBox" class="test-card">
         <div class="card-header">
           <div class="badge-group">
             <span id="testSubject" class="subject-badge">과목</span>
@@ -1987,7 +2009,7 @@
         <!-- 단답형 타이핑 UI -->
         <div id="typingModeBox" style="display:flex; flex-direction:column; gap:14px;">
           <div style="font-size:0.82rem; font-weight:700; color:var(--text-sub);">
-            아래 설명(또는 표·사진)을 보고 해당하는 <b>카드 제목(핵심 개념)</b>을 입력하세요.
+            아래 설명(또는 표·사진)을 보고 해당하는 <b>카드 제목(핵심 개념)</b>을 입력하세요. (↔️ 좌우 스와이프 이동 지원)
           </div>
           <div id="typingPrompt" class="typing-prompt-box"></div>
 
@@ -2008,19 +2030,19 @@
             <div style="display:flex; gap:8px; margin-top:4px; flex-wrap:wrap;">
               <button id="overrideCorrectBtn" class="btn btn-success" onclick="overrideAsCorrect()" style="display:none;">✔ 내 답안도 정답으로 인정</button>
               <button id="manualGraduateBtn" class="btn btn-success" onclick="graduateCurrentCard()" style="display:none;">🎓 오답노트에서 졸업</button>
-              <button class="btn" onclick="nextCard()">다음 문제로 ▶</button>
+              <button class="btn" onclick="nextCard('next')">다음 문제로 ▶</button>
             </div>
           </div>
         </div>
 
-        <!-- 빈칸 가림막 UI -->
+        <!-- 빈칸 가림막 UI (기본값: [대괄호] 및 "큰따옴표" 단어만) -->
         <div id="clozeModeBox" style="display:none; flex-direction:column; gap:14px;">
           <div class="cloze-toolbar">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <span style="font-size:0.82rem; font-weight:700; color:var(--text-sub);">빈칸 기준:</span>
               <select id="clozeRatioSelect" class="filter-select" style="padding:5px 8px;" onchange="renderTestCard()">
-                <option value="0">[대괄호] 및 "큰따옴표" 단어만</option>
-                <option value="0.3" selected>지정 단어 + 자동 30%</option>
+                <option value="0" selected>[대괄호] 및 "큰따옴표" 단어만</option>
+                <option value="0.3">지정 단어 + 자동 30%</option>
                 <option value="0.5">지정 단어 + 자동 50%</option>
               </select>
             </div>
@@ -2033,7 +2055,7 @@
           <div id="clozeTitle" class="cloze-title"></div>
           <div id="clozeContent" class="cloze-content-area"></div>
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <span style="font-size:0.8rem; color:var(--text-sub);">💡 파란색 빈칸을 터치해 확인하세요.</span>
+            <span style="font-size:0.8rem; color:var(--text-sub);">💡 파란색 빈칸을 터치해 확인 · ↔️ 좌우 스와이프로 문제 이동</span>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
               <button class="btn btn-success" onclick="recordSelfScore(true)">⭕ 암기 완료 (정답 기록)</button>
               <button class="btn btn-danger-outline" onclick="recordSelfScore(false)">❌ 재복습 필요 (오답 기록)</button>
@@ -2043,9 +2065,9 @@
       </div>
 
       <div class="study-nav">
-        <button class="btn nav-btn" onclick="prevCard()">◀ 이전 문제</button>
+        <button class="btn nav-btn" onclick="prevCard('prev')">◀ 이전 문제</button>
         <button class="btn" onclick="shuffleCards()">🔀 문제 섞기</button>
-        <button class="btn nav-btn" onclick="nextCard()">다음 문제 ▶</button>
+        <button class="btn nav-btn" onclick="nextCard('next')">다음 문제 ▶</button>
       </div>
     </section>
 
@@ -2354,7 +2376,7 @@
     </div>
   </div>
 
-  <!-- 카드 추가/편집 모달 (바깥 클릭 닫힘 방지 + 실시간 임시저장 + 비주얼 표 생성기 포함) -->
+  <!-- 카드 추가/편집 모달 -->
   <div id="cardModal" class="modal-backdrop" onclick="handleCardModalBackdropClick(event)">
     <div id="cardModalBox" class="modal">
       <div class="modal-title">
@@ -2477,7 +2499,7 @@
     </div>
   </div>
 
-  <!-- 📊 엑셀 / CSV 대량 등록 모달 (입력 중 바깥 클릭 닫힘 방지 적용) -->
+  <!-- 📊 엑셀 / CSV 대량 등록 모달 -->
   <div id="csvModal" class="modal-backdrop" onclick="closeCsvModalOnBackdrop(event)">
     <div id="csvModalBox" class="modal">
       <div class="modal-title">
@@ -2663,6 +2685,13 @@
     let initialCardFormSnapshot = '';
     let autoPushTimer = null;
 
+    // 스와이프 제스처 추적용 변수
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+    let swipeStartTime = 0;
+    let swipeIgnored = false;
+    let justSwipedFlag = false;
+
     function getTodayDateStr() {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -2670,6 +2699,77 @@
 
     function getTodayMonthStr() {
       return getTodayDateStr().slice(0, 7);
+    }
+
+    /* ================= 📱 스마트폰·태블릿 좌우 스와이프(Swipe) 카드 넘기기 로직 ================= */
+    function initSwipeGestures() {
+      const studyCardEl = document.getElementById('flashcardScene');
+      const testCardEl = document.getElementById('testCardBox');
+
+      [studyCardEl, testCardEl].forEach(el => {
+        if (!el) return;
+        el.addEventListener('touchstart', onCardTouchStart, { passive: true });
+        el.addEventListener('touchend', onCardTouchEnd, { passive: true });
+      });
+    }
+
+    function onCardTouchStart(e) {
+      if (e.touches.length !== 1) {
+        swipeIgnored = true;
+        return;
+      }
+
+      const target = e.target;
+      // 입력창이나 버튼 터치 시 스와이프 무시
+      if (target.closest('input, textarea, select, button')) {
+        swipeIgnored = true;
+        return;
+      }
+
+      // 가로 스크롤이 필요한 넓은 표 내부에서 스크롤할 때는 카드 넘김 방지
+      const tableWrap = target.closest('.card-table-wrap');
+      if (tableWrap && tableWrap.scrollWidth > tableWrap.clientWidth) {
+        swipeIgnored = true;
+        return;
+      }
+
+      swipeIgnored = false;
+      swipeStartX = e.touches[0].clientX;
+      swipeStartY = e.touches[0].clientY;
+      swipeStartTime = Date.now();
+    }
+
+    function onCardTouchEnd(e) {
+      if (swipeIgnored || e.changedTouches.length !== 1) return;
+
+      const dx = e.changedTouches[0].clientX - swipeStartX;
+      const dy = e.changedTouches[0].clientY - swipeStartY;
+      const dt = Date.now() - swipeStartTime;
+
+      // 가로 이동 거리가 50px 이상이고, 세로 스크롤보다 가로 이동이 1.5배 이상 뚜렷할 때만 스와이프로 판정
+      if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy) * 1.5 && dt < 650) {
+        justSwipedFlag = true;
+        setTimeout(() => { justSwipedFlag = false; }, 320);
+
+        if (dx < 0) {
+          // 왼쪽으로 스와이프 (👈) -> 다음 카드
+          nextCard('next');
+        } else {
+          // 오른쪽으로 스와이프 (👉) -> 이전 카드
+          prevCard('prev');
+        }
+      }
+    }
+
+    function playSwipeAnimation(direction) {
+      const targetEl = viewMode === 'study'
+        ? document.getElementById('flashcardScene')
+        : document.getElementById('testCardBox');
+      if (!targetEl) return;
+
+      targetEl.classList.remove('swipe-next-effect', 'swipe-prev-effect');
+      void targetEl.offsetWidth;
+      targetEl.classList.add(direction === 'next' ? 'swipe-next-effect' : 'swipe-prev-effect');
     }
 
     /* ================= 🌙 다크 모드 전환 로직 ================= */
@@ -2707,6 +2807,7 @@
 
     async function initApp() {
       initTheme();
+      initSwipeGestures();
 
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -2805,10 +2906,9 @@
       return currentSnap !== initialCardFormSnapshot;
     }
 
-    // 새 카드 추가 중일 때 실시간 임시저장
     function saveCardDraftIfNeeded() {
       const editId = document.getElementById('editCardId').value;
-      if (editId) return; // 기존 카드 편집 모드는 임시저장 대상에서 제외
+      if (editId) return;
 
       const state = getCurrentCardFormStateObj();
       const hasContent = Boolean(state.title.trim() || state.content.trim() || state.imageData);
@@ -2844,17 +2944,14 @@
       showToast('🧹 입력창을 깨끗하게 비웠습니다.');
     }
 
-    // 카드 작성/편집 모달 바깥 배경 클릭 시: 절대 자동으로 닫지 않고 시각적 피드백만 제공
     function handleCardModalBackdropClick(e) {
       if (e.target.id !== 'cardModal') return;
 
-      // 아직 아무것도 입력하지 않은 완전 초기 상태라면 바로 닫기 허용
       if (!isCardFormDirty() && !document.getElementById('cardTitleInput').value.trim() && !document.getElementById('cardContentInput').value.trim()) {
         closeModal();
         return;
       }
 
-      // 입력 중인 내용이 있으면 닫지 않고 모달을 살짝 흔들며 안내 토스트 표시
       const modalBox = document.getElementById('cardModalBox');
       modalBox.classList.remove('nudge');
       void modalBox.offsetWidth;
@@ -2862,7 +2959,6 @@
       showToast('🛡️ 작성 중인 내용 보호를 위해 바깥 터치 닫기가 잠겨 있습니다. [저장하기]나 [취소]를 눌러주세요.');
     }
 
-    // [취소] 또는 [✕] 버튼 클릭 시: 변경 사항이 있으면 확인 후 닫기
     function attemptCloseCardModal() {
       const editId = document.getElementById('editCardId').value;
       if (editId && isCardFormDirty()) {
@@ -3187,7 +3283,7 @@
 
       updateCloudBadgeUI('syncing');
       const payload = {
-        version: 9,
+        version: 10,
         updatedAt: Date.now(),
         updatedTimeStr: new Date().toLocaleString('ko-KR'),
         customSubjects,
@@ -3542,7 +3638,7 @@
     }
 
     function exportBackup() {
-      const blob = new Blob([JSON.stringify({ version: 9, exportedAt: new Date().toISOString(), customSubjects, cards, studyLogs }, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify({ version: 10, exportedAt: new Date().toISOString(), customSubjects, cards, studyLogs }, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `flashcards_backup_${getTodayDateStr().replace(/-/g, '')}.json`;
@@ -4135,6 +4231,9 @@
     }
 
     function flipCard() {
+      // 스와이프 동작 직후 발생한 클릭 이벤트는 무시하여 카드가 의도치 않게 뒤집히는 현상 방지
+      if (justSwipedFlag) return;
+
       const scene = document.getElementById('flashcardScene');
       scene.classList.toggle('is-flipped');
       if (scene.classList.contains('is-flipped') && !flippedLoggedForCurrentCard) {
@@ -4154,7 +4253,7 @@
       if (!card) return;
       if (!flippedLoggedForCurrentCard) recordStudyLog(card, 'view');
       showToast(`✅ '${card.title}' 학습 이력이 기록되었습니다.`);
-      nextCard();
+      nextCard('next');
     }
 
     /* ================= 사진 압축 및 첨부 ================= */
@@ -4672,18 +4771,24 @@
       `).join('');
     }
 
-    function prevCard() {
+    function prevCard(animDir = 'prev') {
       if (filteredCards.length === 0) return;
       currentIndex = (currentIndex - 1 + filteredCards.length) % filteredCards.length;
       renderMainView();
+      playSwipeAnimation(animDir);
     }
 
-    function nextCard() {
+    function nextCard(animDir = 'next') {
       if (filteredCards.length === 0) return;
       const currentCard = filteredCards[currentIndex];
-      if (wrongOnly && currentCard && !currentCard.isWrong) { applyFilters(); return; }
+      if (wrongOnly && currentCard && !currentCard.isWrong) {
+        applyFilters();
+        playSwipeAnimation(animDir);
+        return;
+      }
       currentIndex = (currentIndex + 1) % filteredCards.length;
       renderMainView();
+      playSwipeAnimation(animDir);
     }
 
     function shuffleCards() {
@@ -4693,6 +4798,7 @@
         [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
       }
       currentIndex = 0; renderMainView();
+      showToast('🔀 카드 순서를 랜덤으로 섞었습니다.');
     }
 
     function toggleCurrentFav() { const card = filteredCards[currentIndex]; if (card) toggleFavById(card.id); }
@@ -4755,7 +4861,6 @@
       toggleVisualTableBuilder(false);
       currentEditingImageData = null;
 
-      // 임시저장된 새 카드 데이터(Draft)가 있으면 자동 복원
       const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
       if (savedDraft) {
         try {
@@ -4836,7 +4941,6 @@
       } else {
         cards.unshift({ id: 'card-' + Date.now(), subject, importance, title, content, imageData: currentEditingImageData, imagePos, favorite, isWrong, wrongCount: isWrong ? 1 : 0, createdAt: Date.now() });
         selectedSubject = subject; currentIndex = 0;
-        // 정상 저장 시 임시저장 데이터 삭제
         localStorage.removeItem(DRAFT_STORAGE_KEY);
       }
       saveToStorage(); renderSubjects(); applyFilters(); closeModal();
