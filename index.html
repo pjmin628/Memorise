@@ -222,6 +222,7 @@
       border-color: rgba(225, 29, 72, 0.35);
     }
 
+    /* 검색창 및 X 지우기 버튼 */
     .search-filter-row {
       display: flex;
       gap: 6px;
@@ -230,13 +231,13 @@
 
     .search-box {
       flex: 1;
-      min-width: 150px;
+      min-width: 160px;
       position: relative;
     }
 
     .search-box input {
       width: 100%;
-      padding: 8px 12px 8px 32px;
+      padding: 8px 34px 8px 32px;
       border: 1px solid var(--border);
       border-radius: 10px;
       font-size: 0.88rem;
@@ -257,6 +258,34 @@
       transform: translateY(-50%);
       color: var(--text-sub);
       font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: var(--border);
+      color: var(--text-main);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      padding: 0;
+      transition: background 0.15s ease;
+    }
+
+    .search-clear-btn:hover {
+      background: var(--text-sub);
+      color: #fff;
     }
 
     select.filter-select,
@@ -663,21 +692,11 @@
     table.card-table th,
     table.card-table td {
       padding: 7px 10px;
-      border-bottom: 1px solid var(--border);
-      border-right: 1px solid var(--border);
+      border: 1px solid var(--border);
       line-height: 1.5;
       white-space: pre-wrap;
       word-break: keep-all;
       vertical-align: middle;
-    }
-
-    table.card-table th:last-child,
-    table.card-table td:last-child {
-      border-right: none;
-    }
-
-    table.card-table tr:last-child td {
-      border-bottom: none;
     }
 
     table.card-table th {
@@ -715,7 +734,7 @@
       justify-content: center;
     }
 
-    /* 셀프 테스트 모드 */
+    /* 셀프 테스트 모드 (빈칸 가림막 전용) */
     .test-container {
       display: flex;
       flex-direction: column;
@@ -734,29 +753,16 @@
       gap: 10px;
     }
 
-    .submode-Segment {
+    .test-mode-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--primary);
       display: flex;
+      align-items: center;
       gap: 6px;
     }
 
-    .submode-btn {
-      padding: 7px 13px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface-sub);
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: var(--text-sub);
-      cursor: pointer;
-    }
-
-    .submode-btn.active {
-      background: var(--primary-light);
-      color: var(--primary);
-      border-color: var(--primary);
-    }
-
-    [data-theme="dark"] .submode-btn.active {
+    [data-theme="dark"] .test-mode-title {
       color: #a5b4fc;
     }
 
@@ -792,97 +798,6 @@
       gap: 16px;
       min-height: 320px;
       touch-action: pan-y;
-    }
-
-    .typing-prompt-box {
-      background: var(--surface-sub);
-      border-left: 4px solid var(--primary);
-      padding: 16px;
-      border-radius: 10px;
-      font-size: 0.98rem;
-      line-height: 1.7;
-      white-space: pre-wrap;
-      color: var(--text-main);
-    }
-
-    .hint-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .hint-text {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #d97706;
-      background: rgba(245, 158, 11, 0.16);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      padding: 5px 12px;
-      border-radius: 8px;
-      display: none;
-    }
-
-    [data-theme="dark"] .hint-text {
-      color: #fbbf24;
-    }
-
-    .typing-input-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .typing-input-row input {
-      flex: 1;
-      padding: 12px 14px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      outline: none;
-      background: var(--surface-sub);
-      color: var(--text-main);
-    }
-
-    .typing-input-row input:focus {
-      border-color: var(--primary);
-      background: var(--card-bg);
-    }
-
-    .feedback-box {
-      padding: 14px 16px;
-      border-radius: 12px;
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .feedback-box.correct {
-      display: flex;
-      background: rgba(16, 185, 129, 0.14);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #059669;
-    }
-
-    [data-theme="dark"] .feedback-box.correct {
-      color: #34d399;
-    }
-
-    .feedback-box.wrong {
-      display: flex;
-      background: rgba(239, 68, 68, 0.14);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #dc2626;
-    }
-
-    [data-theme="dark"] .feedback-box.wrong {
-      color: #f87171;
-    }
-
-    .feedback-answer {
-      font-size: 1.1rem;
-      font-weight: 800;
     }
 
     .cloze-toolbar {
@@ -1300,7 +1215,7 @@
       color: var(--text-main);
       border: 1px solid var(--border);
       width: 100%;
-      max-width: 560px;
+      max-width: 580px;
       border-radius: var(--radius);
       padding: 22px;
       box-shadow: 0 20px 25px -5px rgba(0,0,0,0.35);
@@ -1398,7 +1313,7 @@
       gap: 8px;
     }
 
-    /* 📊 비주얼 표 생성기 스타일 */
+    /* 📊 비주얼 표 생성기 스타일 (셀 병합·정렬 툴바 포함) */
     .table-builder-box {
       display: none;
       background: var(--surface-sub);
@@ -1412,6 +1327,17 @@
 
     .table-builder-box.open {
       display: flex;
+    }
+
+    .tb-quick-actions {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
     }
 
     .table-builder-grid {
@@ -1435,6 +1361,7 @@
       resize: vertical;
       outline: none;
       line-height: 1.4;
+      transition: border-color 0.15s, background-color 0.15s;
     }
 
     .tb-cell-input.tb-header {
@@ -1444,8 +1371,17 @@
       text-align: center;
     }
 
+    .tb-cell-input.tb-merged {
+      background: rgba(245, 158, 11, 0.15);
+      border-style: dashed;
+      border-color: #f59e0b;
+      text-align: center;
+      font-weight: 800;
+    }
+
     .tb-cell-input:focus {
       border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
     }
 
     .image-attach-box {
@@ -1873,6 +1809,7 @@
         <div class="search-box">
           <span class="search-icon">🔍</span>
           <input type="text" id="searchInput" placeholder="제목, 내용, 과목 검색..." oninput="handleFilterChange()" />
+          <button type="button" id="searchClearBtn" class="search-clear-btn" onclick="clearSearchInput()" title="검색어 모두 지우기">✕</button>
         </div>
         <select id="impFilter" class="filter-select" onchange="handleFilterChange()">
           <option value="ALL">중요도 전체</option>
@@ -1882,6 +1819,7 @@
         </select>
         <select id="sortOrder" class="filter-select" onchange="handleFilterChange()">
           <option value="newest">최신순</option>
+          <option value="studyAsc">적게 본 순 (학습 적은순)</option>
           <option value="impDesc">중요도 높은순</option>
           <option value="wrongDesc">오답 횟수 많은순</option>
           <option value="titleAsc">제목 가나다순</option>
@@ -1906,7 +1844,7 @@
     <div class="control-bar">
       <div class="view-tabs">
         <button id="tabStudy" class="view-tab active" onclick="setViewMode('study')">플래시카드</button>
-        <button id="tabTest" class="view-tab" onclick="setViewMode('test')">✍️ 셀프 테스트</button>
+        <button id="tabTest" class="view-tab" onclick="setViewMode('test')">🔲 빈칸 셀프 테스트</button>
         <button id="tabStats" class="view-tab" onclick="setViewMode('stats')">📊 월간 통계</button>
         <button id="tabList" class="view-tab" onclick="setViewMode('list')">전체 목록</button>
       </div>
@@ -1923,7 +1861,7 @@
                 <span id="studySubjectFront" class="subject-badge">과목</span>
                 <span id="studyImpFront" class="imp-badge imp-3">★★★</span>
                 <span id="studyWrongBadgeFront" class="wrong-count-badge" style="display:none;">오답 1회</span>
-                <span id="studyMonthBadgeFront" class="study-count-badge">이달 0회</span>
+                <span id="studyMonthBadgeFront" class="study-count-badge">누적 0회</span>
               </div>
               <div class="card-actions-top" onclick="event.stopPropagation()">
                 <button id="studyWrongBtn" class="icon-btn" onclick="toggleCurrentWrong()">📕</button>
@@ -1937,7 +1875,7 @@
               <div id="studyTitle" class="card-title-text">카드가 없습니다</div>
               <div id="studyMediaFront" class="card-media-box" style="display:none;" onclick="event.stopPropagation()"></div>
             </div>
-            <div class="card-footer">👆 터치하면 뒤집기 · ↔️ 좌우 스와이프로 이전/다음 카드 이동</div>
+            <div class="card-footer">👆 터치/스페이스바: 뒤집기 · ↔️ 스와이프/방향키(◀▶): 카드 이동</div>
           </div>
 
           <div class="card-face card-back">
@@ -1946,7 +1884,7 @@
                 <span id="studySubjectBack" class="subject-badge">과목</span>
                 <span id="studyImpBack" class="imp-badge imp-3">★★★</span>
                 <span id="studyWrongBadgeBack" class="wrong-count-badge" style="display:none;">오답 1회</span>
-                <span id="studyMonthBadgeBack" class="study-count-badge">이달 0회</span>
+                <span id="studyMonthBadgeBack" class="study-count-badge">누적 0회</span>
               </div>
               <div class="card-actions-top" onclick="event.stopPropagation()">
                 <button id="studyWrongBtnBack" class="icon-btn" onclick="toggleCurrentWrong()">📕</button>
@@ -1959,7 +1897,7 @@
               <div id="studyMediaBack" class="card-media-box" style="display:none;" onclick="event.stopPropagation()"></div>
               <div id="studyContent" class="card-content-text">내용</div>
             </div>
-            <div class="card-footer">👆 터치하면 앞면으로 · ↔️ 좌우 스와이프로 이전/다음 카드 이동</div>
+            <div class="card-footer">👆 터치/스페이스바: 앞면으로 · ↔️ 스와이프/방향키(◀▶): 카드 이동</div>
           </div>
         </div>
       </div>
@@ -1972,12 +1910,11 @@
       </div>
     </section>
 
-    <!-- 2. 셀프 테스트 모드 -->
+    <!-- 2. 셀프 테스트 모드 (빈칸 가림막 전용) -->
     <section id="testSection" class="test-container" style="display: none;">
       <div class="test-submode-bar">
-        <div class="submode-Segment">
-          <button id="subTypingBtn" class="submode-btn active" onclick="setTestSubMode('typing')">⌨️ 단답형 타이핑</button>
-          <button id="subClozeBtn" class="submode-btn" onclick="setTestSubMode('cloze')">🔲 빈칸 가림막</button>
+        <div class="test-mode-title">
+          <span>🔲 빈칸 가림막 셀프 테스트</span>
         </div>
         <div class="score-board">
           <label class="auto-graduate-label">
@@ -1996,6 +1933,7 @@
             <span id="testSubject" class="subject-badge">과목</span>
             <span id="testImp" class="imp-badge imp-3">★★★</span>
             <span id="testWrongBadge" class="wrong-count-badge" style="display:none;">오답 1회</span>
+            <span id="testStudyBadge" class="study-count-badge">누적 0회</span>
           </div>
           <div class="card-actions-top">
             <button id="testWrongBtn" class="icon-btn" onclick="toggleCurrentWrong()">📕</button>
@@ -2006,37 +1944,7 @@
 
         <div id="testMediaBox" class="card-media-box" style="display:none;"></div>
 
-        <!-- 단답형 타이핑 UI -->
-        <div id="typingModeBox" style="display:flex; flex-direction:column; gap:14px;">
-          <div style="font-size:0.82rem; font-weight:700; color:var(--text-sub);">
-            아래 설명(또는 표·사진)을 보고 해당하는 <b>카드 제목(핵심 개념)</b>을 입력하세요. (↔️ 좌우 스와이프 이동 지원)
-          </div>
-          <div id="typingPrompt" class="typing-prompt-box"></div>
-
-          <div class="hint-row">
-            <button class="btn" onclick="showChosungHint()">💡 초성 힌트 보기</button>
-            <div id="chosungHintBox" class="hint-text"></div>
-          </div>
-
-          <div class="typing-input-row">
-            <input type="text" id="answerInput" placeholder="정답(제목/키워드)을 입력 후 Enter..." onkeydown="if(event.key==='Enter') checkTypingAnswer()" />
-            <button class="btn btn-primary" onclick="checkTypingAnswer()">정답 확인</button>
-          </div>
-
-          <div id="typingFeedback" class="feedback-box">
-            <div id="feedbackHeader" style="font-weight:700; font-size:0.9rem;"></div>
-            <div id="feedbackAnswer" class="feedback-answer"></div>
-            <div id="feedbackSubNotice" style="font-size:0.82rem; opacity:0.9;"></div>
-            <div style="display:flex; gap:8px; margin-top:4px; flex-wrap:wrap;">
-              <button id="overrideCorrectBtn" class="btn btn-success" onclick="overrideAsCorrect()" style="display:none;">✔ 내 답안도 정답으로 인정</button>
-              <button id="manualGraduateBtn" class="btn btn-success" onclick="graduateCurrentCard()" style="display:none;">🎓 오답노트에서 졸업</button>
-              <button class="btn" onclick="nextCard('next')">다음 문제로 ▶</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 빈칸 가림막 UI (기본값: [대괄호] 및 "큰따옴표" 단어만) -->
-        <div id="clozeModeBox" style="display:none; flex-direction:column; gap:14px;">
+        <div id="clozeModeBox" style="display:flex; flex-direction:column; gap:14px;">
           <div class="cloze-toolbar">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <span style="font-size:0.82rem; font-weight:700; color:var(--text-sub);">빈칸 기준:</span>
@@ -2055,7 +1963,7 @@
           <div id="clozeTitle" class="cloze-title"></div>
           <div id="clozeContent" class="cloze-content-area"></div>
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <span style="font-size:0.8rem; color:var(--text-sub);">💡 파란색 빈칸을 터치해 확인 · ↔️ 좌우 스와이프로 문제 이동</span>
+            <span style="font-size:0.8rem; color:var(--text-sub);">💡 파란색 빈칸 터치(또는 스페이스바)로 확인 · ↔️ 스와이프/방향키(◀▶) 이동</span>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
               <button class="btn btn-success" onclick="recordSelfScore(true)">⭕ 암기 완료 (정답 기록)</button>
               <button class="btn btn-danger-outline" onclick="recordSelfScore(false)">❌ 재복습 필요 (오답 기록)</button>
@@ -2376,7 +2284,7 @@
     </div>
   </div>
 
-  <!-- 카드 추가/편집 모달 -->
+  <!-- 카드 추가/편집 모달 (셀 병합·개별 정렬 지원 표 생성기 포함) -->
   <div id="cardModal" class="modal-backdrop" onclick="handleCardModalBackdropClick(event)">
     <div id="cardModalBox" class="modal">
       <div class="modal-title">
@@ -2412,38 +2320,68 @@
 
       <div class="form-group">
         <label>카드 제목 (출력 시 `[과목 - 제목]` 헤더로 표시)</label>
-        <input type="text" id="cardTitleInput" class="form-control" placeholder="예: 사회과학연구방법론 - 실증적 연구 VS 해석적 연구" oninput="saveCardDraftIfNeeded()" />
+        <input type="text" id="cardTitleInput" class="form-control" placeholder="예: 일탈이론 - 머튼의 아노미 & 베커의 낙인이론" oninput="saveCardDraftIfNeeded()" />
       </div>
 
       <div class="form-group">
         <div class="label-with-helper">
           <label style="margin:0;">카드 내용 (`[단어]` 또는 `"단어"` 모두 빈칸 인식)</label>
           <div class="editor-toolbar">
-            <button type="button" class="btn btn-primary" style="padding:4px 9px; font-size:0.75rem;" onclick="toggleVisualTableBuilder()">
+            <button type="button" class="btn btn-primary" style="padding:4px 9px; font-size:0.74rem;" onclick="toggleVisualTableBuilder()">
               📊 표 만들어 넣기
             </button>
-            <button type="button" class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="insertCellLineBreakToken()" title="표 셀 안에서 줄을 바꾸는 // 기호를 넣습니다">
-              ↵ 셀 안 줄바꿈(//)
+            <button type="button" class="btn" style="padding:4px 7px; font-size:0.74rem;" onclick="insertTextTokenAtCursor(' << ', '↔ 왼쪽 셀과 가로 병합(<<) 기호가 입력되었습니다.')" title="표에서 왼쪽 셀과 가로로 합칩니다">
+              ↔ 가로병합(&lt;&lt;)
             </button>
-            <button type="button" class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="wrapSelectedTextWithBrackets()">
-              🔲 드래그 [빈칸]
+            <button type="button" class="btn" style="padding:4px 7px; font-size:0.74rem;" onclick="insertTextTokenAtCursor(' ^^ ', '↕ 위쪽 셀과 세로 병합(^^) 기호가 입력되었습니다.')" title="표에서 위쪽 셀과 세로로 합칩니다">
+              ↕ 세로병합(^^)
+            </button>
+            <button type="button" class="btn" style="padding:4px 7px; font-size:0.74rem;" onclick="insertTextTokenAtCursor('[중] ', '⬌ 해당 셀 가운데 정렬([중]) 기호가 입력되었습니다.')" title="표의 특정 셀을 가운데 정렬합니다">
+              ⬌ 셀 가운데([중])
+            </button>
+            <button type="button" class="btn" style="padding:4px 7px; font-size:0.74rem;" onclick="insertCellLineBreakToken()" title="표 셀 안에서 줄을 바꾸는 // 기호를 넣습니다">
+              ↵ 줄바꿈(//)
+            </button>
+            <button type="button" class="btn" style="padding:4px 7px; font-size:0.74rem;" onclick="wrapSelectedTextWithBrackets()">
+              🔲 [빈칸]
             </button>
           </div>
         </div>
 
-        <!-- 📊 비주얼 표 생성기 -->
+        <!-- 📊 비주얼 표 생성기 (셀 병합 & 개별 정렬 원클릭 툴바 내장) -->
         <div id="visualTableBuilder" class="table-builder-box">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
             <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">
-              📊 칸별 표 입력기 (칸 안에서 스페이스바 띄어쓰기·Enter 줄바꿈 모두 그대로 반영됩니다)
+              📊 칸별 표 입력기 (원하는 칸을 클릭한 뒤 아래 병합·정렬 버튼을 눌러보세요)
             </span>
             <div style="display:flex; gap:6px; align-items:center;">
               <label style="font-size:0.75rem; margin:0;">열(가로):</label>
               <input type="number" id="tbColsInput" value="3" min="2" max="6" style="width:48px; padding:3px 6px; border-radius:6px; border:1px solid var(--border);" onchange="renderTableBuilderGrid()" />
               <label style="font-size:0.75rem; margin:0;">행(세로):</label>
-              <input type="number" id="tbRowsInput" value="2" min="1" max="12" style="width:48px; padding:3px 6px; border-radius:6px; border:1px solid var(--border);" onchange="renderTableBuilderGrid()" />
+              <input type="number" id="tbRowsInput" value="3" min="1" max="12" style="width:48px; padding:3px 6px; border-radius:6px; border:1px solid var(--border);" onchange="renderTableBuilderGrid()" />
             </div>
           </div>
+
+          <!-- 선택한 셀에 바로 병합/정렬 적용하는 원클릭 툴바 -->
+          <div class="tb-quick-actions">
+            <span style="font-size:0.74rem; font-weight:700; color:var(--text-sub);">선택한 칸 편집:</span>
+            <button type="button" class="btn" style="padding:3px 8px; font-size:0.74rem;" onclick="applyTbCellAction('mergeLeft')">
+              ↔ 왼쪽 칸과 합치기(&lt;&lt;)
+            </button>
+            <button type="button" class="btn" style="padding:3px 8px; font-size:0.74rem;" onclick="applyTbCellAction('mergeUp')">
+              ↕ 위쪽 칸과 합치기(^^)
+            </button>
+            <button type="button" class="btn" style="padding:3px 8px; font-size:0.74rem;" onclick="applyTbCellAction('alignCenter')">
+              ⬌ 가운데 맞춤([중])
+            </button>
+            <button type="button" class="btn" style="padding:3px 8px; font-size:0.74rem;" onclick="applyTbCellAction('alignRight')">
+              ➡ 오른쪽 맞춤([우])
+            </button>
+            <button type="button" class="btn" style="padding:3px 8px; font-size:0.74rem;" onclick="applyTbCellAction('clearFormat')">
+              초기화
+            </button>
+          </div>
+
           <div id="tableBuilderGrid" class="table-builder-grid"></div>
           <div style="display:flex; justify-content:flex-end; gap:6px;">
             <button type="button" class="btn" style="padding:5px 10px; font-size:0.76rem;" onclick="toggleVisualTableBuilder(false)">닫기</button>
@@ -2451,7 +2389,7 @@
           </div>
         </div>
 
-        <textarea id="cardContentInput" class="form-control" placeholder="암기할 내용을 입력하세요.&#10;• 표 셀 안에서 연속 띄어쓰기(스페이스바)는 그대로 유지됩니다.&#10;• 표 셀 안에서 줄바꿈을 하려면 // 를 입력하거나 상단의 [📊 표 만들어 넣기]를 이용하세요." oninput="saveCardDraftIfNeeded()"></textarea>
+        <textarea id="cardContentInput" class="form-control" placeholder="암기할 내용을 입력하세요.&#10;• 표에서 칸에 << 를 넣으면 왼쪽 칸과 가로 병합, ^^ 를 넣으면 위쪽 칸과 세로 병합됩니다.&#10;• 칸 맨 앞에 [중] 을 붙이면 해당 칸만 가운데 맞춤됩니다." oninput="saveCardDraftIfNeeded()"></textarea>
       </div>
 
       <div class="form-group">
@@ -2581,12 +2519,13 @@
       '#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316'
     ];
 
+    // 첨부 PDF 6페이지의 머튼 아노미 표 & 베커 낙인이론 표(가로·세로 셀 병합 + 가운데 정렬)를 완벽 재현한 기본 카드 세트
     const DEFAULT_CARDS = [
       {
         id: 'sample-soc-1',
         subject: '사회·문화',
         title: '고전사회학자 - 콩트',
-        content: '• 인간사회도 "자연과학적 방법"에 의해 연구되어야 함 ("사회학적 사실" 영향력에 관심, "방법론적 일원론")\n• 연구방법: 관찰, 실험, "비교", 역사적 분석\n★ 정신 진보 3단계 법칙\n| 단계 이름 | 신학적 단계 | 형이상학적 단계 | 과학적 단계 |\n| --- | --- | --- | --- |\n| 지배적 정신 유형 | "공상적 정신" | "추상적 정신" | "실증적 정신" //   → 관찰, 실험, "비교"의 연구방법 |',
+        content: '• 인간사회도 "자연과학적 방법"에 의해 연구되어야 함 ("사회학적 사실" 영향력에 관심, "방법론적 일원론")\n• 연구방법: 관찰, 실험, "비교", 역사적 분석\n★ 정신 진보 3단계 법칙\n| 단계 이름 | 신학적 단계 | 형이상학적 단계 | 과학적 단계 |\n| --- | --- | --- | --- |\n| [중] 지배적 정신 유형 | [중] "공상적 정신" | [중] "추상적 정신" | "실증적 정신" //   → 관찰, 실험, "비교"의 연구방법 |',
         importance: 3,
         favorite: false,
         isWrong: false,
@@ -2599,7 +2538,7 @@
         id: 'sample-soc-2',
         subject: '사회·문화',
         title: '고전사회학자 - 뒤르켐',
-        content: '- 사회학의 연구대상: "사회적 사실" ("사회학주의")\n- 사회적 사실의 특성: "외재성", "구속성" (개인에 외재하면서 개인을 제약)\n★ 사회현상을 설명하기 위해서는 "원인 분석"(동적·도덕적 밀도 증가)과 "기능 분석"(유기적 연대 형성)이 함께 이루어져야 함\n※ 연대 정리\n| 구분 | 기계적 연대 | 유기적 연대 |\n| --- | --- | --- |\n| ★성질 | "동질성" | "이질성" |\n| ★지배적 법 | "형법" | "민법" |\n| 지배적 규제방식 | "억압적 규제" | "배상적 규제" |\n• 유기적 연대에 적합한 새로운 규범(집합의식): "도덕적 개인주의"',
+        content: '- 사회학의 연구대상: "사회적 사실" ("사회학주의")\n- 사회적 사실의 특성: "외재성", "구속성" (개인에 외재하면서 개인을 제약)\n★ 사회현상을 설명하기 위해서는 "원인 분석"(동적·도덕적 밀도 증가)과 "기능 분석"(유기적 연대 형성)이 함께 이루어져야 함\n※ 연대 정리\n| 구분 | 기계적 연대 | 유기적 연대 |\n| --- | --- | --- |\n| [중] ★성질 | [중] "동질성" | [중] "이질성" |\n| [중] ★지배적 법 | [중] "형법" | [중] "민법" |\n| [중] 지배적 규제방식 | [중] "억압적 규제" | [중] "배상적 규제" |\n• 유기적 연대에 적합한 새로운 규범(집합의식): "도덕적 개인주의"',
         importance: 3,
         favorite: true,
         isWrong: false,
@@ -2611,8 +2550,8 @@
       {
         id: 'sample-soc-3',
         subject: '사회·문화',
-        title: '고전사회학자 - 베버',
-        content: '★★ 사회학의 주요 연구 대상: "사회적 행위" ("이해사회학")\n- 사회현상의 설명은 "인과적 설명"만으로 충분하지 않으며, "해석적 이해"가 동시에 이루어져야 함\n- "이념형": 특징적인 측면만을 부각한 분석적 구성물\n※ 행위의 4가지 이념형: ① "목적합리적" 행위 ② "가치합리적" 행위 ③ "전통적" 행위 ④ "감정적" 행위\n- "프로테스탄트 종교윤리"와 "자본주의 정신" 사이의 "선택적 친화성"\n- 관료제의 발달("형식 합리성" 추구)은 "실질 합리성"을 훼손하여 "합리화의 역설"(인간 소외, 철창) 발생',
+        title: '사회과학연구방법론 - 실증적 연구 VS 해석적 연구',
+        content: '| 구분 | 실증적 연구 | 해석적 연구 |\n| --- | --- | --- |\n| [중] 장점 | · 탐구대상을 수치화, 정확·정밀 연구 가능 // · 연구자 가치 개입 가능성 低 //   = "연구 객관성" 확보 용이 | · 사회·문화 현상의 의미를 연구 대상자 관점에서 이해 // · 새로운 관점 OR "대안적 이론" 제시 가능 |\n| [중] 단점 | ★ 주관적·정신적 영역 연구 한계 // ★ "물상화"된 연구로 연구대상 왜곡 문제 // ★ 사회문화 현상을 지나치게 단순화·기계적 인식 | · 연구자 주관 개입으로 인해 "신뢰도" 저하 // · 사회과학현상 "보편성" 간과 (타당도 비판) // · 연구 결과 "일반화" 難 |',
         importance: 3,
         favorite: false,
         isWrong: true,
@@ -2624,8 +2563,8 @@
       {
         id: 'sample-soc-4',
         subject: '사회·문화',
-        title: '사회과학연구방법론 - 실증적 연구 VS 해석적 연구',
-        content: '| 구분 | 실증적 연구 | 해석적 연구 |\n| --- | --- | --- |\n| 장점 | · 탐구대상을 수치화, 정확·정밀 연구 가능 // · 연구자 가치 개입 가능성 低 //   = "연구 객관성" 확보 용이 | · 사회·문화 현상의 의미를 연구 대상자 관점에서 이해 // · 새로운 관점 OR "대안적 이론" 제시 가능 |\n| 단점 | ★ 주관적·정신적 영역 연구 한계 // ★ "물상화"된 연구로 연구대상 왜곡 문제 // ★ 사회문화 현상을 지나치게 단순화·기계적 인식 | · 연구자 주관 개입으로 인해 "신뢰도" 저하 // · 사회과학현상 "보편성" 간과 (타당도 비판) // · 연구 결과 "일반화" 難 |',
+        title: '일탈이론 - 머튼의 아노미 & 베커의 낙인이론',
+        content: '1. 머튼의 아노미 상태에 대한 개인의 적응 양식 (세로·가로 병합 예시)\n| 적응 양식 구분 | << | 문화적 목표 | 제도적 수단 |\n| --- | --- | --- | --- |\n| [중] 동조 | << | [중] 수용 | [중] 수용 |\n| [중] 일탈적 적응 | [중] "혁신" | [중] 수용 | [중] "거부" |\n| ^^ | [중] "의례주의" | [중] "거부" | [중] 수용 |\n| ^^ | [중] ★"도피주의" | [중] 거부 | [중] 거부 |\n| ^^ | [중] ★"반역" | [중] "대체" | [중] "대체" |\n\n2. 베커의 낙인이론 유형표\n| 구분 | << | 행위의 규범 동조 여부 | << |\n| --- | --- | --- | --- |\n| [중] 반응 | [중] 행위 | [중] 동조 행위 | [중] 위반 행위 |\n| [중] 행위에 대한 // 사회적 반응 | [중] 일탈로 인식 | [중] "오인된 일탈자" | [중] "진짜 일탈자" |\n| ^^ | [중] 동조로 인식 | [중] "규범 동조자" | [중] "숨겨진 일탈자" |',
         importance: 3,
         favorite: false,
         isWrong: false,
@@ -2663,7 +2602,6 @@
     let favOnly = false;
     let wrongOnly = false;
     let viewMode = 'study';
-    let testSubMode = 'typing';
     let currentIndex = 0;
     let filteredCards = [];
     let flippedLoggedForCurrentCard = false;
@@ -2673,10 +2611,6 @@
 
     let scoreO = 0;
     let scoreX = 0;
-    let lastAttemptCardId = null;
-    let lastAttemptLogId = null;
-    let lastAttemptWasWrong = false;
-    let prevWrongStateBeforeAttempt = false;
 
     let pendingCsvCards = [];
     let pendingRestoreData = { cards: [], studyLogs: [], customSubjects: [] };
@@ -2684,8 +2618,8 @@
     let currentEditingImageData = null;
     let initialCardFormSnapshot = '';
     let autoPushTimer = null;
+    let lastFocusedTbCell = null;
 
-    // 스와이프 제스처 추적용 변수
     let swipeStartX = 0;
     let swipeStartY = 0;
     let swipeStartTime = 0;
@@ -2701,7 +2635,46 @@
       return getTodayDateStr().slice(0, 7);
     }
 
-    /* ================= 📱 스마트폰·태블릿 좌우 스와이프(Swipe) 카드 넘기기 로직 ================= */
+    /* ================= ⌨️ PC 키보드 단축키 ================= */
+    function initKeyboardShortcuts() {
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeLightbox();
+          return;
+        }
+
+        const anyModalOpen = document.querySelectorAll('.modal-backdrop.open, .lightbox-backdrop.open').length > 0;
+        const activeTag = document.activeElement ? document.activeElement.tagName : '';
+        const isInputFocused = ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag);
+        if (anyModalOpen || isInputFocused) return;
+
+        if (e.code === 'Space') {
+          if (viewMode === 'study') {
+            e.preventDefault();
+            flipCard();
+          } else if (viewMode === 'test') {
+            e.preventDefault();
+            const blanks = document.querySelectorAll('#clozeContent .cloze-blank');
+            if (blanks.length > 0) {
+              const anyHidden = Array.from(blanks).some(el => !el.classList.contains('revealed'));
+              toggleAllCloze(anyHidden);
+            }
+          }
+        } else if (e.code === 'ArrowRight') {
+          if (viewMode === 'study' || viewMode === 'test') {
+            e.preventDefault();
+            nextCard('next');
+          }
+        } else if (e.code === 'ArrowLeft') {
+          if (viewMode === 'study' || viewMode === 'test') {
+            e.preventDefault();
+            prevCard('prev');
+          }
+        }
+      });
+    }
+
+    /* ================= 📱 스마트폰·태블릿 좌우 스와이프 카드 넘기기 ================= */
     function initSwipeGestures() {
       const studyCardEl = document.getElementById('flashcardScene');
       const testCardEl = document.getElementById('testCardBox');
@@ -2720,13 +2693,11 @@
       }
 
       const target = e.target;
-      // 입력창이나 버튼 터치 시 스와이프 무시
       if (target.closest('input, textarea, select, button')) {
         swipeIgnored = true;
         return;
       }
 
-      // 가로 스크롤이 필요한 넓은 표 내부에서 스크롤할 때는 카드 넘김 방지
       const tableWrap = target.closest('.card-table-wrap');
       if (tableWrap && tableWrap.scrollWidth > tableWrap.clientWidth) {
         swipeIgnored = true;
@@ -2746,16 +2717,13 @@
       const dy = e.changedTouches[0].clientY - swipeStartY;
       const dt = Date.now() - swipeStartTime;
 
-      // 가로 이동 거리가 50px 이상이고, 세로 스크롤보다 가로 이동이 1.5배 이상 뚜렷할 때만 스와이프로 판정
       if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy) * 1.5 && dt < 650) {
         justSwipedFlag = true;
         setTimeout(() => { justSwipedFlag = false; }, 320);
 
         if (dx < 0) {
-          // 왼쪽으로 스와이프 (👈) -> 다음 카드
           nextCard('next');
         } else {
-          // 오른쪽으로 스와이프 (👉) -> 이전 카드
           prevCard('prev');
         }
       }
@@ -2808,6 +2776,7 @@
     async function initApp() {
       initTheme();
       initSwipeGestures();
+      initKeyboardShortcuts();
 
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -2884,7 +2853,7 @@
       if (triggerCloud) scheduleAutoCloudPush();
     }
 
-    /* ================= 🛡️ 입력 중 바깥 클릭 닫힘 방지 & 실시간 임시저장(Draft) 로직 ================= */
+    /* ================= 🛡️ 입력 보호 & 실시간 임시저장 로직 ================= */
     function getCurrentCardFormStateObj() {
       const selectVal = document.getElementById('cardSubjectSelect').value;
       const customSub = document.getElementById('customSubjectInput').value.trim();
@@ -2969,7 +2938,7 @@
       closeModal();
     }
 
-    /* ================= 📊 표 셀 내부 띄어쓰기·줄바꿈 및 비주얼 표 생성기 ================= */
+    /* ================= 📊 표 셀 병합(<<, ^^) · 개별 정렬([중],[우],[좌]) & 비주얼 표 생성기 ================= */
     function toggleVisualTableBuilder(forceState) {
       const box = document.getElementById('visualTableBuilder');
       const nextOpen = forceState !== undefined ? forceState : !box.classList.contains('open');
@@ -2981,27 +2950,89 @@
 
     function renderTableBuilderGrid() {
       const cols = Math.min(6, Math.max(2, parseInt(document.getElementById('tbColsInput').value, 10) || 3));
-      const rows = Math.min(12, Math.max(1, parseInt(document.getElementById('tbRowsInput').value, 10) || 2));
+      const rows = Math.min(12, Math.max(1, parseInt(document.getElementById('tbRowsInput').value, 10) || 3));
       const grid = document.getElementById('tableBuilderGrid');
       grid.style.gridTemplateColumns = `repeat(${cols}, minmax(115px, 1fr))`;
 
       let html = '';
       for (let c = 0; c < cols; c++) {
         const defaultHeader = c === 0 ? '구분' : `항목 ${c}`;
-        html += `<textarea class="tb-cell-input tb-header" data-row="0" data-col="${c}" placeholder="제목열 ${c + 1}">${defaultHeader}</textarea>`;
+        html += `<textarea class="tb-cell-input tb-header" data-row="0" data-col="${c}" onfocus="lastFocusedTbCell=this" oninput="updateTbCellVisualState(this)" placeholder="제목열 ${c + 1}">${defaultHeader}</textarea>`;
       }
       for (let r = 1; r <= rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const ph = c === 0 ? `기준 ${r}` : `내용 입력 (Enter 줄바꿈, 스페이스바 띄어쓰기, "빈칸단어" 가능)`;
-          html += `<textarea class="tb-cell-input" data-row="${r}" data-col="${c}" placeholder="${ph}"></textarea>`;
+          const ph = c === 0 ? `기준 ${r}` : `내용 (<< 가로합침, ^^ 세로합침, [중] 가운데)`;
+          html += `<textarea class="tb-cell-input" data-row="${r}" data-col="${c}" onfocus="lastFocusedTbCell=this" oninput="updateTbCellVisualState(this)" placeholder="${ph}"></textarea>`;
         }
       }
       grid.innerHTML = html;
+      lastFocusedTbCell = grid.querySelector('.tb-cell-input');
+    }
+
+    function updateTbCellVisualState(cellEl) {
+      if (!cellEl) return;
+      const val = cellEl.value.trim();
+      const isMerged = val === '<<' || val === '^^';
+      cellEl.classList.toggle('tb-merged', isMerged);
+      if (val.startsWith('[중]') || val.startsWith('::')) {
+        cellEl.style.textAlign = 'center';
+      } else if (val.startsWith('[우]')) {
+        cellEl.style.textAlign = 'right';
+      } else if (val.startsWith('[좌]')) {
+        cellEl.style.textAlign = 'left';
+      } else if (!cellEl.classList.contains('tb-header') && !isMerged) {
+        cellEl.style.textAlign = 'left';
+      }
+    }
+
+    function applyTbCellAction(action) {
+      if (!lastFocusedTbCell) {
+        showToast('먼저 표 입력기에서 편집할 칸을 클릭해 선택해주세요.');
+        return;
+      }
+      const r = Number(lastFocusedTbCell.getAttribute('data-row'));
+      const c = Number(lastFocusedTbCell.getAttribute('data-col'));
+
+      if (action === 'mergeLeft') {
+        if (c === 0) {
+          showToast('맨 왼쪽 첫 번째 열은 왼쪽 칸과 합칠 수 없습니다. 오른쪽 칸을 선택해 눌러주세요.');
+          return;
+        }
+        lastFocusedTbCell.value = '<<';
+        updateTbCellVisualState(lastFocusedTbCell);
+        showToast('↔ 왼쪽 칸과 가로 병합(<<) 설정되었습니다.');
+      } else if (action === 'mergeUp') {
+        if (r <= 1) {
+          showToast('제목행이나 첫 번째 데이터 행은 위쪽 데이터 칸과 합칠 수 없습니다. 아래쪽 칸을 선택해 눌러주세요.');
+          return;
+        }
+        lastFocusedTbCell.value = '^^';
+        updateTbCellVisualState(lastFocusedTbCell);
+        showToast('↕ 위쪽 칸과 세로 병합(^^) 설정되었습니다.');
+      } else if (action === 'alignCenter') {
+        let val = lastFocusedTbCell.value.replace(/^(\[중\]|\[우\]|\[좌\]|::)\s*/, '');
+        lastFocusedTbCell.value = '[중] ' + val;
+        updateTbCellVisualState(lastFocusedTbCell);
+        showToast('⬌ 해당 칸이 가운데 맞춤([중])으로 설정되었습니다.');
+      } else if (action === 'alignRight') {
+        let val = lastFocusedTbCell.value.replace(/^(\[중\]|\[우\]|\[좌\]|::)\s*/, '');
+        lastFocusedTbCell.value = '[우] ' + val;
+        updateTbCellVisualState(lastFocusedTbCell);
+        showToast('➡ 해당 칸이 오른쪽 맞춤([우])으로 설정되었습니다.');
+      } else if (action === 'clearFormat') {
+        if (lastFocusedTbCell.value.trim() === '<<' || lastFocusedTbCell.value.trim() === '^^') {
+          lastFocusedTbCell.value = '';
+        } else {
+          lastFocusedTbCell.value = lastFocusedTbCell.value.replace(/^(\[중\]|\[우\]|\[좌\]|::)\s*/, '');
+        }
+        updateTbCellVisualState(lastFocusedTbCell);
+      }
+      lastFocusedTbCell.focus();
     }
 
     function insertBuiltTableToContent() {
       const cols = Math.min(6, Math.max(2, parseInt(document.getElementById('tbColsInput').value, 10) || 3));
-      const rows = Math.min(12, Math.max(1, parseInt(document.getElementById('tbRowsInput').value, 10) || 2));
+      const rows = Math.min(12, Math.max(1, parseInt(document.getElementById('tbRowsInput').value, 10) || 3));
 
       const encodeCell = (rawVal) => {
         return String(rawVal || '')
@@ -3038,19 +3069,22 @@
       toggleVisualTableBuilder(false);
       saveCardDraftIfNeeded();
       textarea.focus();
-      showToast('📊 줄바꿈과 띄어쓰기가 반영된 표가 본문에 삽입되었습니다!');
+      showToast('📊 셀 병합과 맞춤이 반영된 표가 본문에 삽입되었습니다!');
     }
 
-    function insertCellLineBreakToken() {
+    function insertTextTokenAtCursor(token, toastMsg) {
       const textarea = document.getElementById('cardContentInput');
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
-      const token = ' // ';
       textarea.value = textarea.value.substring(0, start) + token + textarea.value.substring(end);
       saveCardDraftIfNeeded();
       textarea.focus();
       textarea.setSelectionRange(start + token.length, start + token.length);
-      showToast('↵ 표 셀 내부 줄바꿈 기호(//)가 입력되었습니다.');
+      if (toastMsg) showToast(toastMsg);
+    }
+
+    function insertCellLineBreakToken() {
+      insertTextTokenAtCursor(' // ', '↵ 표 셀 내부 줄바꿈 기호(//)가 입력되었습니다.');
     }
 
     /* ================= ⚙️ 과목 관리 ================= */
@@ -3283,7 +3317,7 @@
 
       updateCloudBadgeUI('syncing');
       const payload = {
-        version: 10,
+        version: 12,
         updatedAt: Date.now(),
         updatedTimeStr: new Date().toLocaleString('ko-KR'),
         customSubjects,
@@ -3638,7 +3672,7 @@
     }
 
     function exportBackup() {
-      const blob = new Blob([JSON.stringify({ version: 10, exportedAt: new Date().toISOString(), customSubjects, cards, studyLogs }, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify({ version: 12, exportedAt: new Date().toISOString(), customSubjects, cards, studyLogs }, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `flashcards_backup_${getTodayDateStr().replace(/-/g, '')}.json`;
@@ -3830,7 +3864,7 @@
             .ultra-blank-box { font-weight: bold; text-decoration: underline; }
             .ultra-ans-text { font-weight: bold; color: #be123c; text-decoration: underline; }
             table.ultra-table { width: 100%; border-collapse: collapse; margin: 5px 0; font-size: 8.5pt; }
-            table.ultra-table th, table.ultra-table td { border: 1px solid #000; padding: 4px 6px; white-space: pre-wrap; }
+            table.ultra-table th, table.ultra-table td { border: 1px solid #000; padding: 4px 6px; white-space: pre-wrap; vertical-align: middle; }
           </style>
         </head><body>${docBodyHtml}</body></html>
       `;
@@ -3867,6 +3901,10 @@
 
     function getCardMonthStudyCount(cardId, monthStr = getTodayMonthStr()) {
       return studyLogs.filter(l => l.cardId === cardId && l.monthStr === monthStr).length;
+    }
+
+    function getCardTotalStudyCount(cardId) {
+      return studyLogs.filter(l => l.cardId === cardId).length;
     }
 
     function updateWrongFilterButtonCount() {
@@ -3924,7 +3962,19 @@
       showToast('오답노트를 모두 비웠습니다.');
     }
 
+    function clearSearchInput() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      handleFilterChange();
+      input.focus();
+    }
+
     function handleFilterChange() {
+      const searchVal = document.getElementById('searchInput').value;
+      const clearBtn = document.getElementById('searchClearBtn');
+      if (clearBtn) {
+        clearBtn.style.display = searchVal.length > 0 ? 'inline-flex' : 'none';
+      }
       currentIndex = 0;
       applyFilters();
     }
@@ -3948,7 +3998,22 @@
         return true;
       });
 
+      const studyCountCache = new Map();
+      if (sort === 'studyAsc') {
+        cards.forEach(c => studyCountCache.set(c.id, 0));
+        studyLogs.forEach(l => {
+          if (studyCountCache.has(l.cardId)) {
+            studyCountCache.set(l.cardId, studyCountCache.get(l.cardId) + 1);
+          }
+        });
+      }
+
       filteredCards.sort((a, b) => {
+        if (sort === 'studyAsc') {
+          const cntA = studyCountCache.get(a.id) || 0;
+          const cntB = studyCountCache.get(b.id) || 0;
+          return cntA - cntB || b.importance - a.importance || b.createdAt - a.createdAt;
+        }
         if (sort === 'impDesc') return b.importance - a.importance || b.createdAt - a.createdAt;
         if (sort === 'wrongDesc') return (b.wrongCount || 0) - (a.wrongCount || 0) || b.importance - a.importance;
         if (sort === 'titleAsc') return a.title.localeCompare(b.title, 'ko');
@@ -3970,15 +4035,6 @@
       renderMainView();
     }
 
-    function setTestSubMode(submode) {
-      testSubMode = submode;
-      document.getElementById('subTypingBtn').classList.toggle('active', submode === 'typing');
-      document.getElementById('subClozeBtn').classList.toggle('active', submode === 'cloze');
-      document.getElementById('typingModeBox').style.display = submode === 'typing' ? 'flex' : 'none';
-      document.getElementById('clozeModeBox').style.display = submode === 'cloze' ? 'flex' : 'none';
-      renderTestCard();
-    }
-
     function getImpLabel(imp) {
       if (Number(imp) === 3) return '★★★ 상';
       if (Number(imp) === 2) return '★★☆ 중';
@@ -3997,7 +4053,9 @@
       let m;
       while ((m = regex.exec(String(rawText ?? ''))) !== null) {
         const word = (m[1] || m[2] || '').trim();
-        if (word && !/^[:\-]+$/.test(word)) kwSet.add(word);
+        if (word && !/^[:\-]+$/.test(word) && !['중', '우', '좌', '가로병합', '세로병합'].includes(word)) {
+          kwSet.add(word);
+        }
       }
       return Array.from(kwSet);
     }
@@ -4010,20 +4068,11 @@
     }
 
     function formatInlineSegment(rawSegment, options = {}) {
-      const { mode = 'normal', autoRatio = 0, maskTitle = '', isTableCell = false } = options;
+      const { mode = 'normal', autoRatio = 0, isTableCell = false } = options;
       let text = String(rawSegment ?? '');
 
       if (isTableCell) {
         text = text.replace(/\s*\/\/\s*/g, '\n').replace(/<br\s*\/?>/gi, '\n');
-      }
-
-      if (mode === 'typing') {
-        text = text.replace(/\[([^\]]+)\]/g, '$1');
-        if (maskTitle && maskTitle.length >= 2) {
-          const escapedTitle = maskTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          text = text.replace(new RegExp(escapedTitle, 'gi'), '[ ❓ 정답 키워드 ]');
-        }
-        return escapeHtmlPreservingSpaces(text);
       }
 
       if (mode === 'cloze' || mode === 'doc-question' || mode === 'doc-answer') {
@@ -4093,21 +4142,121 @@
       return htmlBlocks.join('\n');
     }
 
+    // 가로 병합(<<), 세로 병합(^^), 개별 셀 정렬([중], [우], [좌]) 및 열 정렬(:---:)을 모두 처리하는 고급 표 파서
     function buildHtmlTableFromLines(tableLines, options) {
-      const rows = tableLines
-        .map(line => line.slice(1, -1).split('|').map(cell => cell.replace(/^ | $/g, '')))
-        .filter(cells => !cells.every(c => /^[:\-\s]+$/.test(c)));
-      if (rows.length === 0) return '';
+      const rawParsedLines = tableLines.map(line =>
+        line.slice(1, -1).split('|').map(cell => cell.replace(/^ | $/g, ''))
+      );
 
-      const headerCells = rows[0];
-      const bodyRows = rows.slice(1);
+      let colDefaultAligns = [];
+      const dataLines = [];
+
+      rawParsedLines.forEach(cells => {
+        // 마크다운 구분선(| --- | :---: | ---: |) 감지 및 열 기본 정렬 추출
+        if (cells.every(c => /^[\s:\-]+$/.test(c) && c.includes('-'))) {
+          colDefaultAligns = cells.map(c => {
+            const t = c.trim();
+            if (t.startsWith(':') && t.endsWith(':')) return 'center';
+            if (t.endsWith(':')) return 'right';
+            return null;
+          });
+        } else {
+          dataLines.push(cells);
+        }
+      });
+
+      if (dataLines.length === 0) return '';
+
+      const numRows = dataLines.length;
+      const numCols = Math.max(...dataLines.map(r => r.length));
+
+      // 2차원 셀 객체 그리드 초기화
+      const grid = [];
+      for (let r = 0; r < numRows; r++) {
+        const rowArr = [];
+        for (let c = 0; c < numCols; c++) {
+          let rawVal = dataLines[r][c] !== undefined ? dataLines[r][c] : '';
+          let cellAlign = r === 0 ? 'center' : (colDefaultAligns[c] || 'left');
+
+          rowArr.push({
+            raw: rawVal,
+            isHeader: r === 0,
+            rowspan: 1,
+            colspan: 1,
+            skip: false,
+            align: cellAlign
+          });
+        }
+        grid.push(rowArr);
+      }
+
+      // 셀 병합(<<, ^^) 및 개별 셀 정렬([중], [우], [좌], ::) 계산
+      for (let r = 0; r < numRows; r++) {
+        for (let c = 0; c < numCols; c++) {
+          const cell = grid[r][c];
+          const trimmed = cell.raw.trim();
+
+          // 1. 가로 병합 (<< 또는 [가로병합]) -> 왼쪽의 유효 셀 colspan 증가
+          if (trimmed === '<<' || trimmed === '[가로병합]') {
+            let targetCol = c - 1;
+            while (targetCol >= 0 && grid[r][targetCol].skip) {
+              targetCol--;
+            }
+            if (targetCol >= 0) {
+              grid[r][targetCol].colspan += 1;
+              cell.skip = true;
+              continue;
+            }
+          }
+
+          // 2. 세로 병합 (^^ 또는 [세로병합]) -> 위쪽의 유효 셀 rowspan 증가
+          if (trimmed === '^^' || trimmed === '[세로병합]') {
+            let targetRow = r - 1;
+            while (targetRow >= 0 && grid[targetRow][c].skip) {
+              targetRow--;
+            }
+            if (targetRow >= 0) {
+              grid[targetRow][c].rowspan += 1;
+              cell.skip = true;
+              continue;
+            }
+          }
+
+          // 3. 개별 셀 정렬 접두어 ([중], [우], [좌], ::) 파싱
+          if (/^(\[중\]|\[가운데\]|::)\s*/.test(trimmed)) {
+            cell.align = 'center';
+            cell.raw = cell.raw.replace(/^\s*(\[중\]|\[가운데\]|::)\s*/, '');
+          } else if (/^(\[우\]|\[오른쪽\])\s*/.test(trimmed)) {
+            cell.align = 'right';
+            cell.raw = cell.raw.replace(/^\s*(\[우\]|\[오른쪽\])\s*/, '');
+          } else if (/^(\[좌\]|\[왼쪽\])\s*/.test(trimmed)) {
+            cell.align = 'left';
+            cell.raw = cell.raw.replace(/^\s*(\[좌\]|\[왼쪽\])\s*/, '');
+          }
+        }
+      }
+
       const isDocMode = options.mode === 'doc-question' || options.mode === 'doc-answer';
       const tableClass = isDocMode ? 'ultra-table' : 'card-table';
       const cellOpts = { ...options, isTableCell: true };
 
-      const theadHtml = `<thead><tr>${headerCells.map(c => `<th>${formatInlineSegment(c.trim(), cellOpts)}</th>`).join('')}</tr></thead>`;
-      const tbodyHtml = bodyRows.length > 0
-        ? `<tbody>${bodyRows.map(r => `<tr>${r.map(c => `<td>${formatInlineSegment(c, cellOpts)}</td>`).join('')}</tr>`).join('')}</tbody>`
+      const renderRowCells = (rowArr, tag) => {
+        return rowArr
+          .filter(cell => !cell.skip)
+          .map(cell => {
+            const rsAttr = cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : '';
+            const csAttr = cell.colspan > 1 ? ` colspan="${cell.colspan}"` : '';
+            const alignStyle = ` style="text-align:${cell.align}; vertical-align:middle;"`;
+            const innerContent = formatInlineSegment(cell.isHeader ? cell.raw.trim() : cell.raw, cellOpts);
+            return `<${tag}${rsAttr}${csAttr}${alignStyle}>${innerContent}</${tag}>`;
+          })
+          .join('');
+      };
+
+      const theadHtml = `<thead><tr>${renderRowCells(grid[0], 'th')}</tr></thead>`;
+      const tbodyRows = grid.slice(1);
+      const tbodyHtml = tbodyRows.length > 0
+        ? `<tbody>${tbodyRows.map(r => `<tr>${renderRowCells(r, 'td')}</tr>`).join('')}</tbody>`
         : '';
 
       if (isDocMode) return `<table class="${tableClass}">${theadHtml}${tbodyHtml}</table>`;
@@ -4197,9 +4346,11 @@
       updateWrongBadges(card, document.getElementById('studyWrongBadgeFront'), document.getElementById('studyWrongBtn'));
       updateWrongBadges(card, document.getElementById('studyWrongBadgeBack'), document.getElementById('studyWrongBtnBack'));
 
+      const totalCnt = getCardTotalStudyCount(card.id);
       const monthCnt = getCardMonthStudyCount(card.id);
-      document.getElementById('studyMonthBadgeFront').textContent = `이달 학습 ${monthCnt}회`;
-      document.getElementById('studyMonthBadgeBack').textContent = `이달 학습 ${monthCnt}회`;
+      const badgeText = `누적 ${totalCnt}회 (이달 ${monthCnt})`;
+      document.getElementById('studyMonthBadgeFront').textContent = badgeText;
+      document.getElementById('studyMonthBadgeBack').textContent = badgeText;
 
       const favBtn = document.getElementById('studyFavBtn');
       const favBtnBack = document.getElementById('studyFavBtnBack');
@@ -4231,7 +4382,6 @@
     }
 
     function flipCard() {
-      // 스와이프 동작 직후 발생한 클릭 이벤트는 무시하여 카드가 의도치 않게 뒤집히는 현상 방지
       if (justSwipedFlag) return;
 
       const scene = document.getElementById('flashcardScene');
@@ -4241,9 +4391,11 @@
         if (card) {
           recordStudyLog(card, 'view');
           flippedLoggedForCurrentCard = true;
+          const totalCnt = getCardTotalStudyCount(card.id);
           const monthCnt = getCardMonthStudyCount(card.id);
-          document.getElementById('studyMonthBadgeFront').textContent = `이달 학습 ${monthCnt}회`;
-          document.getElementById('studyMonthBadgeBack').textContent = `이달 학습 ${monthCnt}회`;
+          const badgeText = `누적 ${totalCnt}회 (이달 ${monthCnt})`;
+          document.getElementById('studyMonthBadgeFront').textContent = badgeText;
+          document.getElementById('studyMonthBadgeBack').textContent = badgeText;
         }
       }
     }
@@ -4351,6 +4503,10 @@
       testImp.textContent = getImpLabel(card.importance);
       updateWrongBadges(card, document.getElementById('testWrongBadge'), document.getElementById('testWrongBtn'));
 
+      const totalCnt = getCardTotalStudyCount(card.id);
+      const monthCnt = getCardMonthStudyCount(card.id);
+      document.getElementById('testStudyBadge').textContent = `누적 ${totalCnt}회 (이달 ${monthCnt})`;
+
       const testFavBtn = document.getElementById('testFavBtn');
       testFavBtn.textContent = card.favorite ? '⭐' : '☆';
       testFavBtn.classList.toggle('fav-on', card.favorite);
@@ -4363,104 +4519,9 @@
         testMediaBox.style.display = 'none';
       }
 
-      if (testSubMode === 'typing') {
-        document.getElementById('typingPrompt').innerHTML = renderRichContent(card.content, { mode: 'typing', maskTitle: card.title.trim() });
-        document.getElementById('answerInput').value = '';
-        document.getElementById('chosungHintBox').style.display = 'none';
-        document.getElementById('typingFeedback').className = 'feedback-box';
-      } else {
-        document.getElementById('clozeTitle').textContent = card.title;
-        const ratio = parseFloat(document.getElementById('clozeRatioSelect').value);
-        document.getElementById('clozeContent').innerHTML = renderRichContent(card.content, { mode: 'cloze', autoRatio: ratio });
-      }
-    }
-
-    function getChosung(str) {
-      const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
-      let res = '';
-      for (let i = 0; i < str.length; i++) {
-        const code = str.charCodeAt(i) - 44032;
-        res += (code > -1 && code < 11172) ? CHO[Math.floor(code / 588)] : str.charAt(i);
-      }
-      return res;
-    }
-
-    function showChosungHint() {
-      const card = filteredCards[currentIndex];
-      if (!card) return;
-      const hintEl = document.getElementById('chosungHintBox');
-      hintEl.textContent = `초성 힌트: ${getChosung(card.title)} (${card.title.length}글자)`;
-      hintEl.style.display = 'inline-block';
-    }
-
-    function normalizeAnswer(str) {
-      return String(str).replace(/\([^)]*\)/g, '').replace(/[\s·,\-_/]/g, '').toLowerCase();
-    }
-
-    function checkTypingAnswer() {
-      const card = filteredCards[currentIndex];
-      if (!card) return;
-      const userInput = document.getElementById('answerInput').value.trim();
-      if (!userInput) return;
-
-      const isCorrect = normalizeAnswer(userInput) === normalizeAnswer(card.title) ||
-                        normalizeAnswer(userInput) === card.title.replace(/[\s·,\-_/]/g, '').toLowerCase();
-
-      const fbBox = document.getElementById('typingFeedback');
-      const autoGraduate = document.getElementById('autoGraduateCheck').checked;
-      lastAttemptCardId = card.id;
-      prevWrongStateBeforeAttempt = Boolean(card.isWrong);
-
-      if (isCorrect) {
-        lastAttemptLogId = recordStudyLog(card, 'correct');
-        fbBox.className = 'feedback-box correct';
-        document.getElementById('feedbackHeader').textContent = '🎉 정답입니다!';
-        document.getElementById('feedbackAnswer').textContent = `정답: ${card.title}`;
-        document.getElementById('overrideCorrectBtn').style.display = 'none';
-        scoreO++;
-        lastAttemptWasWrong = false;
-        if (card.isWrong && autoGraduate) {
-          card.isWrong = false;
-          saveToStorage();
-        }
-      } else {
-        lastAttemptLogId = recordStudyLog(card, 'wrong');
-        fbBox.className = 'feedback-box wrong';
-        document.getElementById('feedbackHeader').textContent = `❌ 아쉽습니다! (입력: ${userInput})`;
-        document.getElementById('feedbackAnswer').textContent = `실제 정답: ${card.title}`;
-        document.getElementById('overrideCorrectBtn').style.display = 'inline-flex';
-        scoreX++;
-        lastAttemptWasWrong = true;
-        card.isWrong = true;
-        card.wrongCount = (card.wrongCount || 0) + 1;
-        saveToStorage();
-      }
-      updateWrongBadges(card, document.getElementById('testWrongBadge'), document.getElementById('testWrongBtn'));
-      updateScoreBoard();
-    }
-
-    function overrideAsCorrect() {
-      const card = cards.find(c => c.id === lastAttemptCardId);
-      if (!card || !lastAttemptWasWrong) return;
-      if (scoreX > 0) scoreX--;
-      scoreO++;
-      lastAttemptWasWrong = false;
-      const targetLog = studyLogs.find(l => l.id === lastAttemptLogId);
-      if (targetLog) { targetLog.type = 'correct'; saveLogsToStorage(); }
-      card.wrongCount = Math.max(0, (card.wrongCount || 1) - 1);
-      card.isWrong = document.getElementById('autoGraduateCheck').checked ? false : prevWrongStateBeforeAttempt;
-      saveToStorage();
-      updateScoreBoard();
-      document.getElementById('typingFeedback').className = 'feedback-box correct';
-      document.getElementById('overrideCorrectBtn').style.display = 'none';
-    }
-
-    function graduateCurrentCard() {
-      const card = filteredCards[currentIndex];
-      if (!card) return;
-      card.isWrong = false;
-      saveToStorage();
-      updateWrongBadges(card, document.getElementById('testWrongBadge'), document.getElementById('testWrongBtn'));
+      document.getElementById('clozeTitle').textContent = card.title;
+      const ratio = parseFloat(document.getElementById('clozeRatioSelect').value);
+      document.getElementById('clozeContent').innerHTML = renderRichContent(card.content, { mode: 'cloze', autoRatio: ratio });
     }
 
     function recordSelfScore(isSuccess) {
@@ -4750,25 +4811,29 @@
 
     function renderListCards() {
       const curMonth = getTodayMonthStr();
-      document.getElementById('listSection').innerHTML = filteredCards.map(card => `
-        <div class="list-card">
-          <div class="card-header">
-            <div class="badge-group">
-              <span class="subject-badge">${escapeHtml(card.subject)}</span>
-              <span class="imp-badge imp-${card.importance}">${getImpLabel(card.importance)}</span>
-              <span class="study-count-badge">이달 학습 ${getCardMonthStudyCount(card.id, curMonth)}회</span>
+      document.getElementById('listSection').innerHTML = filteredCards.map(card => {
+        const totalCnt = getCardTotalStudyCount(card.id);
+        const monthCnt = getCardMonthStudyCount(card.id, curMonth);
+        return `
+          <div class="list-card">
+            <div class="card-header">
+              <div class="badge-group">
+                <span class="subject-badge">${escapeHtml(card.subject)}</span>
+                <span class="imp-badge imp-${card.importance}">${getImpLabel(card.importance)}</span>
+                <span class="study-count-badge">누적 ${totalCnt}회 (이달 ${monthCnt})</span>
+              </div>
+              <div class="card-actions-top">
+                <button class="icon-btn ${card.isWrong ? 'wrong-on' : ''}" onclick="toggleWrongById('${card.id}')">📕</button>
+                <button class="icon-btn ${card.favorite ? 'fav-on' : ''}" onclick="toggleFavById('${card.id}')">${card.favorite ? '⭐' : '☆'}</button>
+                <button class="icon-btn" onclick="openEditModalById('${card.id}')">✏️</button>
+                <button class="icon-btn" onclick="deleteCardById('${card.id}')">🗑️</button>
+              </div>
             </div>
-            <div class="card-actions-top">
-              <button class="icon-btn ${card.isWrong ? 'wrong-on' : ''}" onclick="toggleWrongById('${card.id}')">📕</button>
-              <button class="icon-btn ${card.favorite ? 'fav-on' : ''}" onclick="toggleFavById('${card.id}')">${card.favorite ? '⭐' : '☆'}</button>
-              <button class="icon-btn" onclick="openEditModalById('${card.id}')">✏️</button>
-              <button class="icon-btn" onclick="deleteCardById('${card.id}')">🗑️</button>
-            </div>
+            <div class="list-card-title">[${escapeHtml(card.subject)} - ${escapeHtml(card.title)}] ${getImpStarsOnly(card.importance)}</div>
+            <div class="list-card-content">${renderRichContent(card.content, { mode: 'normal' })}</div>
           </div>
-          <div class="list-card-title">[${escapeHtml(card.subject)} - ${escapeHtml(card.title)}] ${getImpStarsOnly(card.importance)}</div>
-          <div class="list-card-content">${renderRichContent(card.content, { mode: 'normal' })}</div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function prevCard(animDir = 'prev') {
