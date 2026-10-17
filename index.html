@@ -2870,9 +2870,28 @@
       };
     }
 
+   // 칸별 표 입력기에 한 글자라도 입력되거나 제목열이 수정되었는지 확인
+    function isTableBuilderDirty() {
+      const box = document.getElementById('visualTableBuilder');
+      if (!box || !box.classList.contains('open')) return false;
+
+      const cells = document.querySelectorAll('#tableBuilderGrid .tb-cell-input');
+      return Array.from(cells).some(cell => {
+        const row = Number(cell.getAttribute('data-row'));
+        const col = Number(cell.getAttribute('data-col'));
+        // 0번째 행(제목열)은 기본값('구분', '항목 1' 등)에서 한 글자라도 바뀌었는지 확인
+        if (row === 0) {
+          const defaultHeader = col === 0 ? '구분' : `항목 ${col}`;
+          return cell.value !== defaultHeader;
+        }
+        // 일반 데이터 칸은 한 글자라도 입력되었는지 확인
+        return cell.value.length > 0;
+      });
+    }
+
     function isCardFormDirty() {
       const currentSnap = JSON.stringify(getCurrentCardFormStateObj());
-      return currentSnap !== initialCardFormSnapshot;
+      return currentSnap !== initialCardFormSnapshot || isTableBuilderDirty();
     }
 
     function saveCardDraftIfNeeded() {
