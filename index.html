@@ -32,7 +32,7 @@
       --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
     }
 
-    /* 🌙 다크 모드(야간 눈 보호 테마) 변수 및 오버라이드 */
+    /* 🌙 다크 모드 변수 */
     [data-theme="dark"] {
       --primary: #6366f1;
       --primary-hover: #818cf8;
@@ -644,8 +644,10 @@
       padding: 7px 10px;
       border-bottom: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      line-height: 1.45;
-      white-space: normal;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: keep-all;
+      vertical-align: middle;
     }
 
     table.card-table th:last-child,
@@ -661,6 +663,7 @@
       background: var(--primary-light);
       color: var(--primary);
       font-weight: 800;
+      text-align: center;
     }
 
     [data-theme="dark"] table.card-table th {
@@ -1281,6 +1284,17 @@
       box-shadow: 0 20px 25px -5px rgba(0,0,0,0.35);
       max-height: 92vh;
       overflow-y: auto;
+      transition: transform 0.15s ease;
+    }
+
+    @keyframes modalNudge {
+      0%, 100% { transform: scale(1); }
+      30% { transform: scale(1.018); }
+      60% { transform: scale(0.992); }
+    }
+
+    .modal.nudge {
+      animation: modalNudge 0.25s ease;
     }
 
     .modal.modal-wide {
@@ -1294,6 +1308,18 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .draft-status-tag {
+      font-size: 0.73rem;
+      font-weight: 700;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.14);
+      padding: 3px 8px;
+      border-radius: 999px;
+      display: none;
     }
 
     .form-group {
@@ -1319,7 +1345,7 @@
 
     .editor-toolbar {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
     }
 
@@ -1342,12 +1368,62 @@
 
     textarea.form-control {
       resize: vertical;
-      min-height: 120px;
+      min-height: 125px;
     }
 
     .subject-input-row {
       display: flex;
       gap: 8px;
+    }
+
+    /* 📊 비주얼 표 생성기 스타일 */
+    .table-builder-box {
+      display: none;
+      background: var(--surface-sub);
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .table-builder-box.open {
+      display: flex;
+    }
+
+    .table-builder-grid {
+      display: grid;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .tb-cell-input {
+      width: 100%;
+      min-width: 110px;
+      min-height: 52px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      background: var(--card-bg);
+      color: var(--text-main);
+      resize: vertical;
+      outline: none;
+      line-height: 1.4;
+    }
+
+    .tb-cell-input.tb-header {
+      background: var(--primary-light);
+      font-weight: 800;
+      min-height: 38px;
+      text-align: center;
+    }
+
+    .tb-cell-input:focus {
+      border-color: var(--primary);
     }
 
     .image-attach-box {
@@ -1386,7 +1462,6 @@
       flex-wrap: wrap;
     }
 
-    /* ⚙️ 과목 관리 모달 전용 리스트 스타일 */
     .subject-manage-list {
       display: flex;
       flex-direction: column;
@@ -1505,7 +1580,6 @@
       top: 0;
     }
 
-    /* 초압축 시험지 과목 다중 선택 칩 스타일 */
     .doc-subject-selector-box {
       background: var(--surface-sub);
       border: 1px solid var(--border);
@@ -1565,7 +1639,6 @@
       margin-bottom: 14px;
     }
 
-    /* 인쇄 미리보기 프레임은 다크 모드에서도 항상 실제 종이(흰 바탕+검은 글씨)처럼 보이도록 고정 */
     .doc-preview-frame {
       border: 1px solid #94a3b8;
       background: #ffffff !important;
@@ -1667,7 +1740,8 @@
       padding: 3px 6px;
       text-align: left;
       vertical-align: middle;
-      line-height: 1.35;
+      line-height: 1.38;
+      white-space: pre-wrap;
       color: #000;
     }
 
@@ -2280,26 +2354,34 @@
     </div>
   </div>
 
-  <!-- 카드 추가/편집 모달 -->
-  <div id="cardModal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)">
-    <div class="modal">
+  <!-- 카드 추가/편집 모달 (바깥 클릭 닫힘 방지 + 실시간 임시저장 + 비주얼 표 생성기 포함) -->
+  <div id="cardModal" class="modal-backdrop" onclick="handleCardModalBackdropClick(event)">
+    <div id="cardModalBox" class="modal">
       <div class="modal-title">
-        <span id="modalTitle">새 플래시카드 추가</span>
-        <button class="btn" style="padding:4px 9px;" onclick="closeModal()">✕</button>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span id="modalTitle">새 플래시카드 추가</span>
+          <span id="draftStatusTag" class="draft-status-tag">💾 자동 임시저장됨</span>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button type="button" id="clearDraftBtn" class="btn" style="padding:4px 8px; font-size:0.74rem; display:none;" onclick="clearFormAndDraft()" title="임시저장된 입력 내용을 모두 비웁니다">
+            🧹 비우기
+          </button>
+          <button type="button" class="btn" style="padding:4px 9px;" onclick="attemptCloseCardModal()">✕</button>
+        </div>
       </div>
       <input type="hidden" id="editCardId" />
 
       <div class="form-group">
         <label>과목 분류</label>
         <div class="subject-input-row">
-          <select id="cardSubjectSelect" class="form-control" onchange="handleSubjectSelectChange()"></select>
-          <input type="text" id="customSubjectInput" class="form-control" placeholder="새 과목명 입력" style="display:none;" />
+          <select id="cardSubjectSelect" class="form-control" onchange="handleSubjectSelectChange(); saveCardDraftIfNeeded();"></select>
+          <input type="text" id="customSubjectInput" class="form-control" placeholder="새 과목명 입력" style="display:none;" oninput="saveCardDraftIfNeeded()" />
         </div>
       </div>
 
       <div class="form-group">
         <label>중요도</label>
-        <select id="cardImportance" class="form-control">
+        <select id="cardImportance" class="form-control" onchange="saveCardDraftIfNeeded()">
           <option value="3">★★★ (상 - 핵심 암기)</option>
           <option value="2" selected>★★☆ (중 - 주요 개념)</option>
           <option value="1">★☆☆ (하 - 기본 참고)</option>
@@ -2308,22 +2390,46 @@
 
       <div class="form-group">
         <label>카드 제목 (출력 시 `[과목 - 제목]` 헤더로 표시)</label>
-        <input type="text" id="cardTitleInput" class="form-control" placeholder="예: 고전사회학자 - 뒤르켐" />
+        <input type="text" id="cardTitleInput" class="form-control" placeholder="예: 사회과학연구방법론 - 실증적 연구 VS 해석적 연구" oninput="saveCardDraftIfNeeded()" />
       </div>
 
       <div class="form-group">
         <div class="label-with-helper">
           <label style="margin:0;">카드 내용 (`[단어]` 또는 `"단어"` 모두 빈칸 인식)</label>
           <div class="editor-toolbar">
-            <button type="button" class="btn" style="padding:4px 8px; font-size:0.76rem;" onclick="insertMarkdownTable()">
-              📊 표 양식 넣기
+            <button type="button" class="btn btn-primary" style="padding:4px 9px; font-size:0.75rem;" onclick="toggleVisualTableBuilder()">
+              📊 표 만들어 넣기
             </button>
-            <button type="button" class="btn" style="padding:4px 8px; font-size:0.76rem;" onclick="wrapSelectedTextWithBrackets()">
-              🔲 드래그 영역 [빈칸]
+            <button type="button" class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="insertCellLineBreakToken()" title="표 셀 안에서 줄을 바꾸는 // 기호를 넣습니다">
+              ↵ 셀 안 줄바꿈(//)
+            </button>
+            <button type="button" class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="wrapSelectedTextWithBrackets()">
+              🔲 드래그 [빈칸]
             </button>
           </div>
         </div>
-        <textarea id="cardContentInput" class="form-control" placeholder="암기할 내용을 입력하세요."></textarea>
+
+        <!-- 📊 비주얼 표 생성기 -->
+        <div id="visualTableBuilder" class="table-builder-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+            <span style="font-size:0.8rem; font-weight:800; color:var(--primary);">
+              📊 칸별 표 입력기 (칸 안에서 스페이스바 띄어쓰기·Enter 줄바꿈 모두 그대로 반영됩니다)
+            </span>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <label style="font-size:0.75rem; margin:0;">열(가로):</label>
+              <input type="number" id="tbColsInput" value="3" min="2" max="6" style="width:48px; padding:3px 6px; border-radius:6px; border:1px solid var(--border);" onchange="renderTableBuilderGrid()" />
+              <label style="font-size:0.75rem; margin:0;">행(세로):</label>
+              <input type="number" id="tbRowsInput" value="2" min="1" max="12" style="width:48px; padding:3px 6px; border-radius:6px; border:1px solid var(--border);" onchange="renderTableBuilderGrid()" />
+            </div>
+          </div>
+          <div id="tableBuilderGrid" class="table-builder-grid"></div>
+          <div style="display:flex; justify-content:flex-end; gap:6px;">
+            <button type="button" class="btn" style="padding:5px 10px; font-size:0.76rem;" onclick="toggleVisualTableBuilder(false)">닫기</button>
+            <button type="button" class="btn btn-primary" style="padding:5px 12px; font-size:0.76rem;" onclick="insertBuiltTableToContent()">본문에 표 삽입하기</button>
+          </div>
+        </div>
+
+        <textarea id="cardContentInput" class="form-control" placeholder="암기할 내용을 입력하세요.&#10;• 표 셀 안에서 연속 띄어쓰기(스페이스바)는 그대로 유지됩니다.&#10;• 표 셀 안에서 줄바꿈을 하려면 // 를 입력하거나 상단의 [📊 표 만들어 넣기]를 이용하세요." oninput="saveCardDraftIfNeeded()"></textarea>
       </div>
 
       <div class="form-group">
@@ -2335,7 +2441,7 @@
               <span style="font-size:0.76rem; color:var(--text-sub);">또는 <b>Ctrl+V</b>로 캡처 붙여넣기</span>
               <input type="file" id="cardImageInput" accept="image/*" style="display:none" onchange="handleCardImageSelect(event)" />
             </div>
-            <select id="cardImagePos" class="filter-select" style="padding:5px 8px; font-size:0.78rem;">
+            <select id="cardImagePos" class="filter-select" style="padding:5px 8px; font-size:0.78rem;" onchange="saveCardDraftIfNeeded()">
               <option value="back" selected>뒷면(정답/설명)에 표시</option>
               <option value="front">앞면(질문)에 표시</option>
               <option value="both">앞·뒷면 모두 표시</option>
@@ -2355,25 +2461,25 @@
 
       <div class="form-group" style="display:flex; flex-direction:column; gap:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <input type="checkbox" id="cardFavoriteInput" style="width:18px; height:18px;" />
+          <input type="checkbox" id="cardFavoriteInput" style="width:18px; height:18px;" onchange="saveCardDraftIfNeeded()" />
           <label for="cardFavoriteInput" style="margin:0; cursor:pointer;">⭐ 즐겨찾기에 추가</label>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-          <input type="checkbox" id="cardWrongInput" style="width:18px; height:18px;" />
+          <input type="checkbox" id="cardWrongInput" style="width:18px; height:18px;" onchange="saveCardDraftIfNeeded()" />
           <label for="cardWrongInput" style="margin:0; cursor:pointer;">📕 오답노트에 추가</label>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn" onclick="closeModal()">취소</button>
-        <button class="btn btn-primary" onclick="saveCard()">저장하기</button>
+        <button type="button" class="btn" onclick="attemptCloseCardModal()">취소</button>
+        <button type="button" class="btn btn-primary" onclick="saveCard()">저장하기</button>
       </div>
     </div>
   </div>
 
-  <!-- 📊 엑셀 / CSV 대량 등록 모달 -->
+  <!-- 📊 엑셀 / CSV 대량 등록 모달 (입력 중 바깥 클릭 닫힘 방지 적용) -->
   <div id="csvModal" class="modal-backdrop" onclick="closeCsvModalOnBackdrop(event)">
-    <div class="modal">
+    <div id="csvModalBox" class="modal">
       <div class="modal-title">
         <span>📊 엑셀 / CSV 대량 관리</span>
         <button class="btn" style="padding:4px 9px;" onclick="closeCsvModal()">✕</button>
@@ -2447,6 +2553,7 @@
     const SUBJECTS_STORAGE_KEY = 'pocket_flashcard_subjects_v1';
     const CLOUD_CONFIG_KEY = 'pocket_flashcard_gist_cfg_v1';
     const THEME_STORAGE_KEY = 'pocket_flashcard_theme_v1';
+    const DRAFT_STORAGE_KEY = 'pocket_flashcard_draft_v1';
 
     const SUBJECT_PALETTE = [
       '#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316'
@@ -2457,7 +2564,7 @@
         id: 'sample-soc-1',
         subject: '사회·문화',
         title: '고전사회학자 - 콩트',
-        content: '• 인간사회도 "자연과학적 방법"에 의해 연구되어야 함 ("사회학적 사실" 영향력에 관심, "방법론적 일원론")\n• 연구방법: 관찰, 실험, "비교", 역사적 분석\n★ 정신 진보 3단계 법칙\n| 구분 | 신학적 단계 | 형이상학적 단계 | 과학적 단계 |\n| --- | --- | --- | --- |\n| 지배적 정신 유형 | "공상적 정신" | "추상적 정신" | "실증적 정신" (관찰·실험·비교) |',
+        content: '• 인간사회도 "자연과학적 방법"에 의해 연구되어야 함 ("사회학적 사실" 영향력에 관심, "방법론적 일원론")\n• 연구방법: 관찰, 실험, "비교", 역사적 분석\n★ 정신 진보 3단계 법칙\n| 단계 이름 | 신학적 단계 | 형이상학적 단계 | 과학적 단계 |\n| --- | --- | --- | --- |\n| 지배적 정신 유형 | "공상적 정신" | "추상적 정신" | "실증적 정신" //   → 관찰, 실험, "비교"의 연구방법 |',
         importance: 3,
         favorite: false,
         isWrong: false,
@@ -2493,10 +2600,10 @@
         createdAt: Date.now() - 3000
       },
       {
-        id: 'sample-edu-1',
-        subject: '교육론',
-        title: '백워드 교육과정 설계 3단계',
-        content: '위긴스와 맥타이(Wiggins & McTighe)가 제시한 교육과정 설계 모형:\n1단계: [바라는 결과] 확인하기 (성취기준, 영속적 이해)\n2단계: [수용 가능한 증거] 결정하기 (수행과제, 평가계획)\n3단계: [학습 경험과 수업] 계획하기 (WHERETO 원리)',
+        id: 'sample-soc-4',
+        subject: '사회·문화',
+        title: '사회과학연구방법론 - 실증적 연구 VS 해석적 연구',
+        content: '| 구분 | 실증적 연구 | 해석적 연구 |\n| --- | --- | --- |\n| 장점 | · 탐구대상을 수치화, 정확·정밀 연구 가능 // · 연구자 가치 개입 가능성 低 //   = "연구 객관성" 확보 용이 | · 사회·문화 현상의 의미를 연구 대상자 관점에서 이해 // · 새로운 관점 OR "대안적 이론" 제시 가능 |\n| 단점 | ★ 주관적·정신적 영역 연구 한계 // ★ "물상화"된 연구로 연구대상 왜곡 문제 // ★ 사회문화 현상을 지나치게 단순화·기계적 인식 | · 연구자 주관 개입으로 인해 "신뢰도" 저하 // · 사회과학현상 "보편성" 간과 (타당도 비판) // · 연구 결과 "일반화" 難 |',
         importance: 3,
         favorite: false,
         isWrong: false,
@@ -2506,11 +2613,11 @@
         createdAt: Date.now() - 2000
       },
       {
-        id: 'sample-law-1',
-        subject: '법·정치',
-        title: '죄형법정주의 파생 원칙',
-        content: '"법률이 없으면 범죄도 없고 형벌도 없다"는 근대 형법의 대원칙.\n1. [관습형법 금지]의 원칙\n2. [소급효 금지]의 원칙\n3. [명확성]의 원칙\n4. [유추해석 금지]의 원칙\n5. [적정성]의 원칙',
-        importance: 2,
+        id: 'sample-edu-1',
+        subject: '교육론',
+        title: '백워드 교육과정 설계 3단계',
+        content: '위긴스와 맥타이(Wiggins & McTighe)가 제시한 교육과정 설계 모형:\n1단계: [바라는 결과] 확인하기 (성취기준, 영속적 이해)\n2단계: [수용 가능한 증거] 결정하기 (수행과제, 평가계획)\n3단계: [학습 경험과 수업] 계획하기 (WHERETO 원리)',
+        importance: 3,
         favorite: false,
         isWrong: false,
         wrongCount: 0,
@@ -2553,6 +2660,7 @@
     let pendingRestoreData = { cards: [], studyLogs: [], customSubjects: [] };
     let docSelectedSubjects = new Set();
     let currentEditingImageData = null;
+    let initialCardFormSnapshot = '';
     let autoPushTimer = null;
 
     function getTodayDateStr() {
@@ -2564,7 +2672,7 @@
       return getTodayDateStr().slice(0, 7);
     }
 
-    /* ================= 🌙 다크 모드(야간 눈 보호 테마) 전환 로직 ================= */
+    /* ================= 🌙 다크 모드 전환 로직 ================= */
     function initTheme() {
       const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
       if (savedTheme === 'dark' || savedTheme === 'light') {
@@ -2675,7 +2783,181 @@
       if (triggerCloud) scheduleAutoCloudPush();
     }
 
-    /* ================= ⚙️ 과목 관리 (이름 일괄 수정 · 통합 · 초기화 · 삭제) ================= */
+    /* ================= 🛡️ 입력 중 바깥 클릭 닫힘 방지 & 실시간 임시저장(Draft) 로직 ================= */
+    function getCurrentCardFormStateObj() {
+      const selectVal = document.getElementById('cardSubjectSelect').value;
+      const customSub = document.getElementById('customSubjectInput').value.trim();
+      return {
+        subjectSelect: selectVal,
+        customSubject: customSub,
+        importance: document.getElementById('cardImportance').value,
+        title: document.getElementById('cardTitleInput').value,
+        content: document.getElementById('cardContentInput').value,
+        imagePos: document.getElementById('cardImagePos').value,
+        imageData: currentEditingImageData || null,
+        favorite: document.getElementById('cardFavoriteInput').checked,
+        isWrong: document.getElementById('cardWrongInput').checked
+      };
+    }
+
+    function isCardFormDirty() {
+      const currentSnap = JSON.stringify(getCurrentCardFormStateObj());
+      return currentSnap !== initialCardFormSnapshot;
+    }
+
+    // 새 카드 추가 중일 때 실시간 임시저장
+    function saveCardDraftIfNeeded() {
+      const editId = document.getElementById('editCardId').value;
+      if (editId) return; // 기존 카드 편집 모드는 임시저장 대상에서 제외
+
+      const state = getCurrentCardFormStateObj();
+      const hasContent = Boolean(state.title.trim() || state.content.trim() || state.imageData);
+
+      if (hasContent) {
+        try {
+          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(state));
+          document.getElementById('draftStatusTag').style.display = 'inline-block';
+          document.getElementById('clearDraftBtn').style.display = 'inline-flex';
+        } catch (e) {}
+      } else {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        document.getElementById('draftStatusTag').style.display = 'none';
+        document.getElementById('clearDraftBtn').style.display = 'none';
+      }
+    }
+
+    function clearFormAndDraft() {
+      if (!confirm('입력 중인 내용과 임시저장 데이터를 모두 비우시겠습니까?')) return;
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      document.getElementById('cardTitleInput').value = '';
+      document.getElementById('cardContentInput').value = '';
+      document.getElementById('customSubjectInput').value = '';
+      document.getElementById('cardImportance').value = '2';
+      document.getElementById('cardImagePos').value = 'back';
+      document.getElementById('cardFavoriteInput').checked = false;
+      document.getElementById('cardWrongInput').checked = false;
+      currentEditingImageData = null;
+      updateModalImagePreview();
+      document.getElementById('draftStatusTag').style.display = 'none';
+      document.getElementById('clearDraftBtn').style.display = 'none';
+      initialCardFormSnapshot = JSON.stringify(getCurrentCardFormStateObj());
+      showToast('🧹 입력창을 깨끗하게 비웠습니다.');
+    }
+
+    // 카드 작성/편집 모달 바깥 배경 클릭 시: 절대 자동으로 닫지 않고 시각적 피드백만 제공
+    function handleCardModalBackdropClick(e) {
+      if (e.target.id !== 'cardModal') return;
+
+      // 아직 아무것도 입력하지 않은 완전 초기 상태라면 바로 닫기 허용
+      if (!isCardFormDirty() && !document.getElementById('cardTitleInput').value.trim() && !document.getElementById('cardContentInput').value.trim()) {
+        closeModal();
+        return;
+      }
+
+      // 입력 중인 내용이 있으면 닫지 않고 모달을 살짝 흔들며 안내 토스트 표시
+      const modalBox = document.getElementById('cardModalBox');
+      modalBox.classList.remove('nudge');
+      void modalBox.offsetWidth;
+      modalBox.classList.add('nudge');
+      showToast('🛡️ 작성 중인 내용 보호를 위해 바깥 터치 닫기가 잠겨 있습니다. [저장하기]나 [취소]를 눌러주세요.');
+    }
+
+    // [취소] 또는 [✕] 버튼 클릭 시: 변경 사항이 있으면 확인 후 닫기
+    function attemptCloseCardModal() {
+      const editId = document.getElementById('editCardId').value;
+      if (editId && isCardFormDirty()) {
+        if (!confirm('수정한 내용이 아직 저장되지 않았습니다. 저장하지 않고 닫으시겠습니까?')) {
+          return;
+        }
+      }
+      closeModal();
+    }
+
+    /* ================= 📊 표 셀 내부 띄어쓰기·줄바꿈 및 비주얼 표 생성기 ================= */
+    function toggleVisualTableBuilder(forceState) {
+      const box = document.getElementById('visualTableBuilder');
+      const nextOpen = forceState !== undefined ? forceState : !box.classList.contains('open');
+      box.classList.toggle('open', nextOpen);
+      if (nextOpen) {
+        renderTableBuilderGrid();
+      }
+    }
+
+    function renderTableBuilderGrid() {
+      const cols = Math.min(6, Math.max(2, parseInt(document.getElementById('tbColsInput').value, 10) || 3));
+      const rows = Math.min(12, Math.max(1, parseInt(document.getElementById('tbRowsInput').value, 10) || 2));
+      const grid = document.getElementById('tableBuilderGrid');
+      grid.style.gridTemplateColumns = `repeat(${cols}, minmax(115px, 1fr))`;
+
+      let html = '';
+      for (let c = 0; c < cols; c++) {
+        const defaultHeader = c === 0 ? '구분' : `항목 ${c}`;
+        html += `<textarea class="tb-cell-input tb-header" data-row="0" data-col="${c}" placeholder="제목열 ${c + 1}">${defaultHeader}</textarea>`;
+      }
+      for (let r = 1; r <= rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const ph = c === 0 ? `기준 ${r}` : `내용 입력 (Enter 줄바꿈, 스페이스바 띄어쓰기, "빈칸단어" 가능)`;
+          html += `<textarea class="tb-cell-input" data-row="${r}" data-col="${c}" placeholder="${ph}"></textarea>`;
+        }
+      }
+      grid.innerHTML = html;
+    }
+
+    function insertBuiltTableToContent() {
+      const cols = Math.min(6, Math.max(2, parseInt(document.getElementById('tbColsInput').value, 10) || 3));
+      const rows = Math.min(12, Math.max(1, parseInt(document.getElementById('tbRowsInput').value, 10) || 2));
+
+      const encodeCell = (rawVal) => {
+        return String(rawVal || '')
+          .replace(/\|/g, '｜')
+          .replace(/\r?\n/g, ' // ');
+      };
+
+      const headerCells = [];
+      for (let c = 0; c < cols; c++) {
+        const el = document.querySelector(`#tableBuilderGrid [data-row="0"][data-col="${c}"]`);
+        headerCells.push(encodeCell(el ? el.value : `항목 ${c + 1}`));
+      }
+
+      const divider = Array.from({ length: cols }, () => '---');
+      const lines = [
+        `| ${headerCells.join(' | ')} |`,
+        `| ${divider.join(' | ')} |`
+      ];
+
+      for (let r = 1; r <= rows; r++) {
+        const rowCells = [];
+        for (let c = 0; c < cols; c++) {
+          const el = document.querySelector(`#tableBuilderGrid [data-row="${r}"][data-col="${c}"]`);
+          rowCells.push(encodeCell(el ? el.value : ''));
+        }
+        lines.push(`| ${rowCells.join(' | ')} |`);
+      }
+
+      const tableMarkdown = (document.getElementById('cardContentInput').value ? '\n' : '') + lines.join('\n') + '\n';
+      const textarea = document.getElementById('cardContentInput');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      textarea.value = textarea.value.substring(0, start) + tableMarkdown + textarea.value.substring(end);
+      toggleVisualTableBuilder(false);
+      saveCardDraftIfNeeded();
+      textarea.focus();
+      showToast('📊 줄바꿈과 띄어쓰기가 반영된 표가 본문에 삽입되었습니다!');
+    }
+
+    function insertCellLineBreakToken() {
+      const textarea = document.getElementById('cardContentInput');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const token = ' // ';
+      textarea.value = textarea.value.substring(0, start) + token + textarea.value.substring(end);
+      saveCardDraftIfNeeded();
+      textarea.focus();
+      textarea.setSelectionRange(start + token.length, start + token.length);
+      showToast('↵ 표 셀 내부 줄바꿈 기호(//)가 입력되었습니다.');
+    }
+
+    /* ================= ⚙️ 과목 관리 ================= */
     function getAllSubjectNames() {
       const set = new Set(customSubjects.map(s => s.trim()).filter(Boolean));
       cards.forEach(c => {
@@ -2722,7 +3004,7 @@
                 <span style="font-size:0.76rem; color:var(--text-sub);">(⭐ ${favCnt} · 📕 오답 ${wrongCnt})</span>
               </div>
               <div style="display:flex; gap:5px;">
-                <button type="button" class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="resetSubjectFlags('${escapeHtml(sub)}')" title="이 과목의 오답노트 표시를 모두 해제합니다">
+                <button type="button" class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="resetSubjectFlags('${escapeHtml(sub)}')">
                   🧹 오답 초기화
                 </button>
                 <button type="button" class="btn btn-danger-outline" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteEntireSubject('${escapeHtml(sub)}')">
@@ -2828,7 +3110,7 @@
         showToast(`'${subName}' 과목에는 현재 오답노트에 등록된 카드가 없습니다.`);
         return;
       }
-      if (!confirm(`'${subName}' 과목의 오답노트 카드 ${targetCards.length}장을 모두 오답 해제하시겠습니까?\n(카드 자체는 삭제되지 않습니다.)`)) {
+      if (!confirm(`'${subName}' 과목의 오답노트 카드 ${targetCards.length}장을 모두 오답 해제하시겠습니까?`)) {
         return;
       }
       cards.forEach(c => {
@@ -2843,7 +3125,7 @@
     function deleteEntireSubject(subName) {
       const targetCount = cards.filter(c => c.subject === subName).length;
       const msg = targetCount > 0
-        ? `⚠️ 정말 '${subName}' 과목과 그 안에 속한 카드 ${targetCount}장을 모두 삭제하시겠습니까?\n(삭제 전 필요한 경우 백업을 권장합니다.)`
+        ? `⚠️ 정말 '${subName}' 과목과 그 안에 속한 카드 ${targetCount}장을 모두 삭제하시겠습니까?`
         : `'${subName}' 빈 과목을 목록에서 삭제하시겠습니까?`;
 
       if (!confirm(msg)) return;
@@ -2905,7 +3187,7 @@
 
       updateCloudBadgeUI('syncing');
       const payload = {
-        version: 7,
+        version: 9,
         updatedAt: Date.now(),
         updatedTimeStr: new Date().toLocaleString('ko-KR'),
         customSubjects,
@@ -3056,7 +3338,7 @@
     }
 
     function disconnectCloud() {
-      if (!confirm('GitHub Gist 동기화 연결을 해제하시겠습니까? (기기에 저장된 카드는 유지됩니다.)')) return;
+      if (!confirm('GitHub Gist 동기화 연결을 해제하시겠습니까?')) return;
       cloudConfig = { gistToken: '', gistId: '', autoSync: false, lastSyncText: '' };
       localStorage.removeItem(CLOUD_CONFIG_KEY);
       updateCloudBadgeUI();
@@ -3075,7 +3357,13 @@
     }
 
     function closeRestoreModalOnBackdrop(e) {
-      if (e.target.id === 'restoreModal') closeRestoreModal();
+      if (e.target.id === 'restoreModal') {
+        if (pendingRestoreData.cards.length > 0) {
+          showToast('🛡️ 복원 대기 중인 파일이 있습니다. [취소]나 [✕]를 눌러 닫아주세요.');
+          return;
+        }
+        closeRestoreModal();
+      }
     }
 
     function clearRestoreInput() {
@@ -3254,7 +3542,7 @@
     }
 
     function exportBackup() {
-      const blob = new Blob([JSON.stringify({ version: 7, exportedAt: new Date().toISOString(), customSubjects, cards, studyLogs }, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify({ version: 9, exportedAt: new Date().toISOString(), customSubjects, cards, studyLogs }, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `flashcards_backup_${getTodayDateStr().replace(/-/g, '')}.json`;
@@ -3262,7 +3550,7 @@
       showToast('💾 백업 파일(JSON)이 다운로드되었습니다.');
     }
 
-    /* ================= 🖨️ 초압축 시험지 출력 로직 (과목 다중 선택 지원) ================= */
+    /* ================= 🖨️ 초압축 시험지 출력 로직 ================= */
     function renderDocSubjectCheckboxes() {
       const container = document.getElementById('docSubjectCheckList');
       const allSubjects = getAllSubjectNames();
@@ -3297,11 +3585,8 @@
     }
 
     function onDocSubjectCheckChange(subjectName, checked) {
-      if (checked) {
-        docSelectedSubjects.add(subjectName);
-      } else {
-        docSelectedSubjects.delete(subjectName);
-      }
+      if (checked) docSelectedSubjects.add(subjectName);
+      else docSelectedSubjects.delete(subjectName);
       renderDocSubjectCheckboxes();
       updateDocPreview();
     }
@@ -3309,30 +3594,18 @@
     function toggleAllDocSubjects(selectAll) {
       const allSubjects = getAllSubjectNames();
       docSelectedSubjects.clear();
-      if (selectAll) {
-        allSubjects.forEach(s => docSelectedSubjects.add(s));
-      }
+      if (selectAll) allSubjects.forEach(s => docSelectedSubjects.add(s));
       renderDocSubjectCheckboxes();
       updateDocPreview();
     }
 
     function getTargetCardsForDoc() {
       const scope = document.getElementById('docTargetScope').value;
-
-      if (scope === 'filtered') {
-        return filteredCards.filter(c => docSelectedSubjects.has(c.subject));
-      }
-
+      if (scope === 'filtered') return filteredCards.filter(c => docSelectedSubjects.has(c.subject));
       let baseList = cards.filter(c => docSelectedSubjects.has(c.subject));
-
-      if (scope === 'wrong') {
-        baseList = baseList.filter(c => c.isWrong);
-      } else if (scope === 'fav') {
-        baseList = baseList.filter(c => c.favorite);
-      } else if (scope === 'highImp') {
-        baseList = baseList.filter(c => Number(c.importance) === 3);
-      }
-
+      if (scope === 'wrong') baseList = baseList.filter(c => c.isWrong);
+      else if (scope === 'fav') baseList = baseList.filter(c => c.favorite);
+      else if (scope === 'highImp') baseList = baseList.filter(c => Number(c.importance) === 3);
       return baseList;
     }
 
@@ -3461,7 +3734,7 @@
             .ultra-blank-box { font-weight: bold; text-decoration: underline; }
             .ultra-ans-text { font-weight: bold; color: #be123c; text-decoration: underline; }
             table.ultra-table { width: 100%; border-collapse: collapse; margin: 5px 0; font-size: 8.5pt; }
-            table.ultra-table th, table.ultra-table td { border: 1px solid #000; padding: 4px 6px; }
+            table.ultra-table th, table.ultra-table td { border: 1px solid #000; padding: 4px 6px; white-space: pre-wrap; }
           </style>
         </head><body>${docBodyHtml}</body></html>
       `;
@@ -3633,9 +3906,20 @@
       return Array.from(kwSet);
     }
 
+    function escapeHtmlPreservingSpaces(str) {
+      const escaped = escapeHtml(str);
+      return escaped
+        .replace(/^ +/gm, m => '&nbsp;'.repeat(m.length))
+        .replace(/ {2,}/g, m => '&nbsp;'.repeat(m.length));
+    }
+
     function formatInlineSegment(rawSegment, options = {}) {
-      const { mode = 'normal', autoRatio = 0, maskTitle = '' } = options;
+      const { mode = 'normal', autoRatio = 0, maskTitle = '', isTableCell = false } = options;
       let text = String(rawSegment ?? '');
+
+      if (isTableCell) {
+        text = text.replace(/\s*\/\/\s*/g, '\n').replace(/<br\s*\/?>/gi, '\n');
+      }
 
       if (mode === 'typing') {
         text = text.replace(/\[([^\]]+)\]/g, '$1');
@@ -3643,7 +3927,7 @@
           const escapedTitle = maskTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
           text = text.replace(new RegExp(escapedTitle, 'gi'), '[ ❓ 정답 키워드 ]');
         }
-        return escapeHtml(text);
+        return escapeHtmlPreservingSpaces(text);
       }
 
       if (mode === 'cloze' || mode === 'doc-question' || mode === 'doc-answer') {
@@ -3662,28 +3946,29 @@
         return parts.map(part => {
           if (part.type === 'manualBlank') {
             if (mode === 'cloze') {
-              return `<span class="cloze-blank" onclick="event.stopPropagation(); this.classList.toggle('revealed')">${escapeHtml(part.val)}</span>`;
+              return `<span class="cloze-blank" onclick="event.stopPropagation(); this.classList.toggle('revealed')">${escapeHtmlPreservingSpaces(part.val)}</span>`;
             }
             if (mode === 'doc-question') {
               const spaceLen = Math.max(4, Math.min(18, part.val.length * 2));
               return `<span class="ultra-blank-box">(${'&nbsp;'.repeat(spaceLen)})</span>`;
             }
             if (mode === 'doc-answer') {
-              return `<span class="ultra-ans-text">"${escapeHtml(part.val)}"</span>`;
+              return `<span class="ultra-ans-text">"${escapeHtmlPreservingSpaces(part.val)}"</span>`;
             }
           }
-          if (autoRatio <= 0 || mode !== 'cloze') return escapeHtml(part.val);
+          if (autoRatio <= 0 || mode !== 'cloze') return escapeHtmlPreservingSpaces(part.val);
           return part.val.split(/(\s+)/).map(tok => {
+            if (/^\s+$/.test(tok)) return escapeHtmlPreservingSpaces(tok);
             const cleanWord = tok.replace(/[.,?!:;()"'•\-]/g, '');
             if (cleanWord.length >= 2 && Math.random() < autoRatio) {
-              return `<span class="cloze-blank" onclick="event.stopPropagation(); this.classList.toggle('revealed')">${escapeHtml(tok)}</span>`;
+              return `<span class="cloze-blank" onclick="event.stopPropagation(); this.classList.toggle('revealed')">${escapeHtmlPreservingSpaces(tok)}</span>`;
             }
-            return escapeHtml(tok);
+            return escapeHtmlPreservingSpaces(tok);
           }).join('');
         }).join('');
       }
 
-      return escapeHtml(text.replace(/\[([^\]]+)\]/g, '$1'));
+      return escapeHtmlPreservingSpaces(text.replace(/\[([^\]]+)\]/g, '$1'));
     }
 
     function renderRichContent(rawText, options = {}) {
@@ -3703,7 +3988,7 @@
         } else {
           let textLines = [];
           while (i < lines.length && !(lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|') && lines[i].trim().length > 2)) {
-            textLines.push(formatInlineSegment(lines[i], options));
+            textLines.push(formatInlineSegment(lines[i], { ...options, isTableCell: false }));
             i++;
           }
           htmlBlocks.push(textLines.join('\n'));
@@ -3714,18 +3999,19 @@
 
     function buildHtmlTableFromLines(tableLines, options) {
       const rows = tableLines
-        .map(line => line.slice(1, -1).split('|').map(cell => cell.trim()))
-        .filter(cells => !cells.every(c => /^[:\-]+$/.test(c)));
+        .map(line => line.slice(1, -1).split('|').map(cell => cell.replace(/^ | $/g, '')))
+        .filter(cells => !cells.every(c => /^[:\-\s]+$/.test(c)));
       if (rows.length === 0) return '';
 
       const headerCells = rows[0];
       const bodyRows = rows.slice(1);
       const isDocMode = options.mode === 'doc-question' || options.mode === 'doc-answer';
       const tableClass = isDocMode ? 'ultra-table' : 'card-table';
+      const cellOpts = { ...options, isTableCell: true };
 
-      const theadHtml = `<thead><tr>${headerCells.map(c => `<th>${formatInlineSegment(c, options)}</th>`).join('')}</tr></thead>`;
+      const theadHtml = `<thead><tr>${headerCells.map(c => `<th>${formatInlineSegment(c.trim(), cellOpts)}</th>`).join('')}</tr></thead>`;
       const tbodyHtml = bodyRows.length > 0
-        ? `<tbody>${bodyRows.map(r => `<tr>${r.map(c => `<td>${formatInlineSegment(c, options)}</td>`).join('')}</tr>`).join('')}</tbody>`
+        ? `<tbody>${bodyRows.map(r => `<tr>${r.map(c => `<td>${formatInlineSegment(c, cellOpts)}</td>`).join('')}</tr>`).join('')}</tbody>`
         : '';
 
       if (isDocMode) return `<table class="${tableClass}">${theadHtml}${tbodyHtml}</table>`;
@@ -3871,7 +4157,7 @@
       nextCard();
     }
 
-    /* ================= 사진 압축 및 표 삽입 ================= */
+    /* ================= 사진 압축 및 첨부 ================= */
     function compressImageDataUrl(file, maxWidth = 1000, quality = 0.8) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -3907,6 +4193,7 @@
       try {
         currentEditingImageData = await compressImageDataUrl(file);
         updateModalImagePreview();
+        saveCardDraftIfNeeded();
         showToast('📷 사진이 첨부되었습니다.');
       } catch (err) {
         alert('이미지 처리 중 오류가 발생했습니다.');
@@ -3928,6 +4215,7 @@
     function removeAttachedImage() {
       currentEditingImageData = null;
       updateModalImagePreview();
+      saveCardDraftIfNeeded();
     }
 
     function openLightbox(src) {
@@ -3952,21 +4240,6 @@
         }
       }
     });
-
-    function insertMarkdownTable() {
-      const cols = Math.min(6, Math.max(2, parseInt(prompt('열(가로 칸) 개수:', '3'), 10) || 3));
-      const rows = Math.min(15, Math.max(1, parseInt(prompt('행(세로 줄) 개수:', '3'), 10) || 3));
-      const headers = Array.from({ length: cols }, (_, idx) => idx === 0 ? '구분' : `항목 ${idx}`);
-      const divider = Array.from({ length: cols }, () => '---');
-      let lines = [`| ${headers.join(' | ')} |`, `| ${divider.join(' | ')} |`];
-      for (let r = 1; r <= rows; r++) {
-        const cells = Array.from({ length: cols }, (_, cIdx) => cIdx === 0 ? `기준 ${r}` : `"핵심내용 ${r}-${cIdx}"`);
-        lines.push(`| ${cells.join(' | ')} |`);
-      }
-      const textarea = document.getElementById('cardContentInput');
-      textarea.value += '\n' + lines.join('\n') + '\n';
-      textarea.focus();
-    }
 
     /* ================= 셀프 테스트 로직 ================= */
     function renderTestCard() {
@@ -4128,7 +4401,15 @@
     /* ================= CSV 및 월간 통계 & 목록 관리 ================= */
     function openCsvModal() { clearCsvInput(); document.getElementById('csvModal').classList.add('open'); }
     function closeCsvModal() { document.getElementById('csvModal').classList.remove('open'); }
-    function closeCsvModalOnBackdrop(e) { if (e.target.id === 'csvModal') closeCsvModal(); }
+    function closeCsvModalOnBackdrop(e) {
+      if (e.target.id === 'csvModal') {
+        if (document.getElementById('csvPasteArea').value.trim()) {
+          showToast('🛡️ 입력 중인 CSV 데이터가 있어 바깥 터치 닫기가 잠겨 있습니다. [닫기]를 눌러주세요.');
+          return;
+        }
+        closeCsvModal();
+      }
+    }
     function clearCsvInput() {
       document.getElementById('csvFileInput').value = '';
       document.getElementById('csvPasteArea').value = '';
@@ -4437,6 +4718,7 @@
       if (start === end) return;
       const wrapped = `[${textarea.value.substring(start, end)}]`;
       textarea.value = textarea.value.substring(0, start) + wrapped + textarea.value.substring(end);
+      saveCardDraftIfNeeded();
       textarea.focus();
     }
 
@@ -4466,7 +4748,46 @@
       populateSubjectSelect();
       document.getElementById('cardTitleInput').value = '';
       document.getElementById('cardContentInput').value = '';
-      currentEditingImageData = null; updateModalImagePreview();
+      document.getElementById('cardImportance').value = '2';
+      document.getElementById('cardImagePos').value = 'back';
+      document.getElementById('cardFavoriteInput').checked = false;
+      document.getElementById('cardWrongInput').checked = false;
+      toggleVisualTableBuilder(false);
+      currentEditingImageData = null;
+
+      // 임시저장된 새 카드 데이터(Draft)가 있으면 자동 복원
+      const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (savedDraft) {
+        try {
+          const d = JSON.parse(savedDraft);
+          if (d && (d.title || d.content || d.imageData)) {
+            if (d.subjectSelect) {
+              const selectEl = document.getElementById('cardSubjectSelect');
+              if (Array.from(selectEl.options).some(o => o.value === d.subjectSelect)) {
+                selectEl.value = d.subjectSelect;
+                handleSubjectSelectChange();
+              }
+            }
+            if (d.customSubject) document.getElementById('customSubjectInput').value = d.customSubject;
+            if (d.importance) document.getElementById('cardImportance').value = String(d.importance);
+            if (d.title) document.getElementById('cardTitleInput').value = d.title;
+            if (d.content) document.getElementById('cardContentInput').value = d.content;
+            if (d.imagePos) document.getElementById('cardImagePos').value = d.imagePos;
+            currentEditingImageData = d.imageData || null;
+            document.getElementById('cardFavoriteInput').checked = Boolean(d.favorite);
+            document.getElementById('cardWrongInput').checked = Boolean(d.isWrong);
+            document.getElementById('draftStatusTag').style.display = 'inline-block';
+            document.getElementById('clearDraftBtn').style.display = 'inline-flex';
+            showToast('📝 이전에 작성하던 임시저장 내용을 자동으로 불러왔습니다.');
+          }
+        } catch (e) {}
+      } else {
+        document.getElementById('draftStatusTag').style.display = 'none';
+        document.getElementById('clearDraftBtn').style.display = 'none';
+      }
+
+      updateModalImagePreview();
+      initialCardFormSnapshot = JSON.stringify(getCurrentCardFormStateObj());
       document.getElementById('cardModal').classList.add('open');
     }
 
@@ -4476,18 +4797,22 @@
       if (!card) return;
       document.getElementById('modalTitle').textContent = '플래시카드 편집';
       document.getElementById('editCardId').value = card.id;
+      document.getElementById('draftStatusTag').style.display = 'none';
+      document.getElementById('clearDraftBtn').style.display = 'none';
       populateSubjectSelect(card.subject);
       document.getElementById('cardImportance').value = String(card.importance);
       document.getElementById('cardTitleInput').value = card.title;
       document.getElementById('cardContentInput').value = card.content;
+      document.getElementById('cardImagePos').value = card.imagePos || 'back';
+      toggleVisualTableBuilder(false);
       currentEditingImageData = card.imageData || null; updateModalImagePreview();
       document.getElementById('cardFavoriteInput').checked = Boolean(card.favorite);
       document.getElementById('cardWrongInput').checked = Boolean(card.isWrong);
+      initialCardFormSnapshot = JSON.stringify(getCurrentCardFormStateObj());
       document.getElementById('cardModal').classList.add('open');
     }
 
     function closeModal() { document.getElementById('cardModal').classList.remove('open'); }
-    function closeModalOnBackdrop(e) { if (e.target.id === 'cardModal') closeModal(); }
 
     function saveCard() {
       const editId = document.getElementById('editCardId').value;
@@ -4500,7 +4825,10 @@
       const favorite = document.getElementById('cardFavoriteInput').checked;
       const isWrong = document.getElementById('cardWrongInput').checked;
 
-      if (!subject || !title || (!content && !currentEditingImageData)) return;
+      if (!subject || !title || (!content && !currentEditingImageData)) {
+        alert('과목, 제목, 내용을 입력해주세요.');
+        return;
+      }
 
       if (editId) {
         const idx = cards.findIndex(c => c.id === editId);
@@ -4508,6 +4836,8 @@
       } else {
         cards.unshift({ id: 'card-' + Date.now(), subject, importance, title, content, imageData: currentEditingImageData, imagePos, favorite, isWrong, wrongCount: isWrong ? 1 : 0, createdAt: Date.now() });
         selectedSubject = subject; currentIndex = 0;
+        // 정상 저장 시 임시저장 데이터 삭제
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
       }
       saveToStorage(); renderSubjects(); applyFilters(); closeModal();
       showToast('저장되었습니다.');
@@ -4525,7 +4855,7 @@
       toast.textContent = msg;
       toast.classList.add('show');
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+      window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
     function escapeHtml(str) {
